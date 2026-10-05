@@ -1,8 +1,14 @@
-# 🤖 24/7 雲端 Telegram Gemini Bot (Google Apps Script 架構)
+# 🤖 Serverless AI 智慧對話助理 Bot (第一版)
 
-這是一個完全運行在 **Google Apps Script (GAS) 雲端環境**、**24 小時不中斷運行** 且 **完全免費** 的 Telegram AI 智慧助理。它串接了 **Google Gemini API**，具備上下文對話記憶、白名單安全存取控制、每日呼叫上限防護，並自動將所有提問、回答與 Token 消耗記錄於 Google 試算表中。
+> **期中專題 第一版作業成果**
+> - 📄 **專題計畫書**：[專題計畫書_AI智慧助理Bot第一版.pdf](專題計畫書_AI智慧助理Bot第一版.pdf)
+> - 📊 **專題簡報**：[專題簡報_AI智慧助理Bot第一版.pdf](專題簡報_AI智慧助理Bot第一版.pdf)
+> - 🌐 **開發紀錄網頁**：[index.html (含實測證明專區)](https://chinkunlim.github.io/wk05_bot/)
+> - 🔍 **實測證明章節**：位於開發紀錄網頁的 **【第 5 章：實測證明與對話成果展示 (#proof-of-testing)】**
+> - 📦 **GitHub 專案**：[https://github.com/chinkunlim/wk05_bot](https://github.com/chinkunlim/wk05_bot)
 
 ---
+
 
 ## 🌟 核心特色
 

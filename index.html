@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serverless AI 智慧對話助理 Bot (第一版) | 開發紀錄與實測報告</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+      scroll-behavior: smooth;
+    }
+    .gradient-hero {
+      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
+                  radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.15), transparent 40%),
+                  #0f172a;
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .badge-highlight {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl badge-highlight flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div>
+          <span class="font-extrabold text-lg text-white tracking-tight">AI Bot v1.7.0</span>
+          <span class="hidden sm:inline-block ml-2 text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">第一版成果</span>
+        </div>
+      </div>
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+        <a href="#overview" class="hover:text-indigo-400 transition">專題概要</a>
+        <a href="#architecture" class="hover:text-indigo-400 transition">系統架構</a>
+        <a href="#features" class="hover:text-indigo-400 transition">核心功能</a>
+        <a href="#dev-journey" class="hover:text-indigo-400 transition">避坑紀錄</a>
+        <a href="#proof-of-testing" class="text-indigo-400 font-bold hover:text-indigo-300 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-clipboard-check"></i> 實測證明
+        </a>
+        <a href="#pending-issues" class="hover:text-indigo-400 transition">待改善問題</a>
+      </nav>
+      <div class="flex items-center space-x-3">
+        <a href="https://github.com/chinkunlim/wk05_bot" target="_blank" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3.5 py-2 rounded-lg border border-slate-700 transition font-semibold">
+          <i class="fa-brands fa-github text-base"></i> GitHub 專案
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="gradient-hero pt-32 pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800/80">
+    <div class="max-w-5xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-6">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 24/7 零成本 Serverless 雲端原生架構
+      </div>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white mb-6 leading-tight">
+        智慧對話助理 Bot <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">第一版實作</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+        本專題旨在打造無伺服器 (Serverless)、高安全性與額度防護的 AI 聊天機器人。整合 Google Apps Script (GAS)、Google Gemini API 與 Google Sheets，第一版優先完成 Telegram Bot 核心引擎，並已規劃後續 LINE Messaging API 雙軌接軌。
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-semibold">
+        <a href="#proof-of-testing" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition">
+          <i class="fa-solid fa-circle-check"></i> 前往查看實測證明
+        </a>
+        <a href="https://github.com/chinkunlim/wk05_bot" target="_blank" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition">
+          <i class="fa-brands fa-github"></i> 瀏覽 GitHub 原始碼
+        </a>
+        <a href="專題計畫書_AI智慧助理Bot第一版.pdf" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition">
+          <i class="fa-solid fa-file-pdf text-red-400"></i> 專題計畫書 PDF
+        </a>
+        <a href="專題簡報_AI智慧助理Bot第一版.pdf" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition">
+          <i class="fa-solid fa-file-powerpoint text-amber-400"></i> 簡報 PDF
+        </a>
+      </div>
+
+      <!-- Quick Info Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14 max-w-4xl mx-auto text-left">
+        <div class="glass-card p-4 rounded-xl">
+          <div class="text-xs text-slate-400">專題進度</div>
+          <div class="text-lg font-bold text-emerald-400 flex items-center gap-1.5 mt-1">
+            <i class="fa-solid fa-battery-half"></i> 第一版完成 (v1.7.0)
+          </div>
+        </div>
+        <div class="glass-card p-4 rounded-xl">
+          <div class="text-xs text-slate-400">雲端運算環境</div>
+          <div class="text-lg font-bold text-white mt-1">Google Apps Script</div>
+        </div>
+        <div class="glass-card p-4 rounded-xl">
+          <div class="text-xs text-slate-400">LLM 核心模型</div>
+          <div class="text-lg font-bold text-indigo-300 mt-1">Gemini 2.5 Flash</div>
+        </div>
+        <div class="glass-card p-4 rounded-xl">
+          <div class="text-xs text-slate-400">測試證明位置</div>
+          <div class="text-lg font-bold text-pink-400 mt-1">
+            <a href="#proof-of-testing" class="underline decoration-pink-400/50">網頁第 5 章</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+    <!-- Section 1: Overview -->
+    <section id="overview" class="space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">1</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">專題計畫與緣起</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 items-stretch">
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+          <h3 class="text-lg font-bold text-indigo-300 flex items-center gap-2">
+            <i class="fa-solid fa-bullseye text-indigo-400"></i> 開發背景與目標
+          </h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            現代學生與商務人士需要 24 小時隨手可得的 AI 秘書，然而在雲端部署聊天機器人常面臨三大困境：
+          </p>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-xmark text-red-400 mt-1"></i>
+              <span><strong>伺服器主機開銷</strong>：傳統租用 VPS (AWS/GCP/Heroku) 每月需負擔維護費與固定開銷。</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-xmark text-red-400 mt-1"></i>
+              <span><strong>公開 Webhook 額度遭盜刷</strong>：Bot 暴露在外，未授權路人發送訊息將瞬間榨乾 Gemini 免費配額。</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-xmark text-red-400 mt-1"></i>
+              <span><strong>無本機資料留存與稽核</strong>：問答紀錄散落，無法系統化分析統計使用成本。</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+          <h3 class="text-lg font-bold text-emerald-300 flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> 解決方案與核心原則
+          </h3>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            本專案採用 <strong>100% 雲端原生 Serverless</strong> 設計，徹底達成：
+          </p>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
+              <span><strong>零主機費用</strong>：藉由 Google Apps Script 作為 24/7 Webhook 處理引擎，終生免費託管。</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
+              <span><strong>雙重免費額度安全鎖</strong>：白名單 (Allowed User IDs) + 當日呼叫次數限制器 (Daily Quota)。</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fa-solid fa-check text-emerald-400 mt-1"></i>
+              <span><strong>試算表即時稽核</strong>：自動建立 Google Sheets 歷史對話歷程、Token 用量與時間戳記。</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Architecture -->
+    <section id="architecture" class="space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">2</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">系統架構與資料流</h2>
+      </div>
+
+      <div class="glass-card p-8 rounded-2xl">
+        <div class="text-center max-w-2xl mx-auto mb-8">
+          <p class="text-slate-300 text-sm">
+            本架構具備低延遲、高強韌性，在 Google Cloud 全球骨幹網路上完成請求驗證、快取讀取與 LLM 推論。
+          </p>
+        </div>
+
+        <!-- Architecture Flow Diagram -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center text-center">
+          <div class="bg-slate-900 border border-slate-700 p-4 rounded-xl">
+            <div class="text-indigo-400 text-2xl mb-2"><i class="fa-brands fa-telegram"></i></div>
+            <div class="font-bold text-white text-sm">Telegram 用戶</div>
+            <div class="text-xs text-slate-400 mt-1">發送提問訊息</div>
+          </div>
+          <div class="text-slate-500 text-xl hidden md:block"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="bg-slate-900 border border-indigo-500/50 p-4 rounded-xl shadow-lg shadow-indigo-500/10">
+            <div class="text-emerald-400 text-2xl mb-2"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="font-bold text-white text-sm">GAS 路由與守門員</div>
+            <div class="text-xs text-slate-400 mt-1">白名單檢驗 / 去重 / 配額防護</div>
+          </div>
+          <div class="text-slate-500 text-xl hidden md:block"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="bg-slate-900 border border-purple-500/50 p-4 rounded-xl shadow-lg shadow-purple-500/10">
+            <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-brain"></i></div>
+            <div class="font-bold text-white text-sm">Gemini 2.5 Flash</div>
+            <div class="text-xs text-slate-400 mt-1">8K Token / 時間基準 / 429 降級</div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-800 grid md:grid-cols-2 gap-4 text-xs text-slate-400">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-database text-amber-400"></i>
+            <span><strong>短期快取</strong>：Google CacheService (20 分鐘對話記憶、4 輪上下文)。</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-table text-emerald-400"></i>
+            <span><strong>長期儲存</strong>：Google Sheets (主動寫入日期、使用者 ID、Prompt、回答、Tokens)。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Features Matrix -->
+    <section id="features" class="space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">3</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">第一版已實現核心功能 (v1.0 ~ v1.7.0)</h2>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-indigo-500 space-y-2">
+          <div class="font-bold text-white text-base flex items-center justify-between">
+            <span>🛡️ 身分與配額防護</span>
+            <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded">安全防護</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            嚴格白名單比對機制。非授權使用者完全無法觸發 Gemini API，當日配額達標自動防禦並友善提示，守護免費額度。
+          </p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-purple-500 space-y-2">
+          <div class="font-bold text-white text-base flex items-center justify-between">
+            <span>⚡ Update ID 防重擊機制</span>
+            <span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">強韌通訊</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Telegram Webhook 超時重試防護。以 CacheService 鎖定 Update ID 並即刻回傳 200 OK，徹底終結重複狂發訊息風暴。
+          </p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-pink-500 space-y-2">
+          <div class="font-bold text-white text-base flex items-center justify-between">
+            <span>🎨 Telegram HTML 格式轉換</span>
+            <span class="text-xs bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded">顯示優化</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            將 Gemini Markdown 語法（標題、粗體、列表）平滑轉譯為 Telegram 支援之原生 HTML 格式，自動修復未閉合標籤。
+          </p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-emerald-500 space-y-2">
+          <div class="font-bold text-white text-base flex items-center justify-between">
+            <span>📖 8192 Token 與長文接續</span>
+            <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">超長回覆</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            解放最大輸出長度至 8192 Tokens；若遇截斷自動提示輸入「繼續」，無縫串接下一段長篇分析。
+          </p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-amber-500 space-y-2">
+          <div class="font-bold text-white text-base flex items-center justify-between">
+            <span>🔄 429 智慧無縫降級</span>
+            <span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded">高可用性</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            針對免費帳號 Grounding 配額為 0 造成的 HTTP 429 拒絕，系統自動拔除搜尋參數即時重發，對話永遠不中斷中斷。
+          </p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-l-4 border-l-cyan-500 space-y-2">
+          <div class="font-bold text-white text-base flex items-center justify-between">
+            <span>🕒 真實世界時間認知基準</span>
+            <span class="text-xs bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded">精準時鐘</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            在 System Instruction 動態注入台北當前確切時間與年份（2026年），徹底破除模型將「今年」誤認作 2025 年之盲點。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Dev Journey & Pitfalls -->
+    <section id="dev-journey" class="space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">4</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">AI 協作開發歷程與避坑指南</h2>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl space-y-6 text-sm">
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <span class="px-2.5 py-1 rounded bg-red-500/20 text-red-400 font-mono text-xs font-bold mt-0.5">坑點 1</span>
+            <div>
+              <h4 class="font-bold text-white text-base">Telegram 訊息無限迴圈與重發風暴</h4>
+              <p class="text-slate-400 mt-1">
+                <strong>現象</strong>：測試時 Telegram 一直瘋狂跳出重複訊息。<br>
+                <strong>根本原因</strong>：GAS 呼叫 Gemini 時耗時超過 3~5 秒，Telegram 伺服器因未收到 HTTP 200 回應，認定 Webhook 失敗而啟動指數退避重發。<br>
+                <strong>解決之道</strong>：在 `Main.gs` 最前端快取 `update_id`，若重複直接略過；並確保 `doPost` 一律以 `HtmlService.createHtmlOutput('OK')` 回傳成功。
+              </p>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-800 pt-4 flex items-start gap-3">
+            <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-xs font-bold mt-0.5">坑點 2</span>
+            <div>
+              <h4 class="font-bold text-white text-base">Telegram HTML 解析語法崩潰 (Bad Request: can't parse entities)</h4>
+              <p class="text-slate-400 mt-1">
+                <strong>現象</strong>：模型回答長文或書單時，出現亂碼符號，或直接報錯無法發送。<br>
+                <strong>根本原因</strong>：Gemini 預設輸出 Markdown (如 `### 標題`、`**粗體**`)，Telegram 不支援部分標籤，或當長度截斷時未閉合的 `<b>` 標籤引發 API 拒收。<br>
+                <strong>解決之道</strong>：自研 `markdownToTelegramHtml()` 轉換器，轉譯常用語法，並加入正規表達式自動補齊未閉合的 HTML 標籤。
+              </p>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-800 pt-4 flex items-start gap-3">
+            <span class="px-2.5 py-1 rounded bg-purple-500/20 text-purple-400 font-mono text-xs font-bold mt-0.5">坑點 3</span>
+            <div>
+              <h4 class="font-bold text-white text-base">開啟 Google Search 聯網搜尋引發 429 報錯與 2025 年盲點</h4>
+              <p class="text-slate-400 mt-1">
+                <strong>現象</strong>：設定 `ENABLE_GOOGLE_SEARCH = true` 出現 429 報錯；設為 false 則 AI 誤以為今年是 2025 年。<br>
+                <strong>根本原因</strong>：Google AI Studio 對未綁定信用卡之免費專案，Google Search Grounding 配額為 0；且離線知識庫截止於 2025 年初。<br>
+                <strong>解決之道</strong>：`Gemini.gs` 實裝 429 自動拔除工具並即時重試機制（無感降級），並透過 `systemInstruction` 注入真實台北時間（2026年）。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Proof of Testing (HIGHLIGHTED SECTION FOR HOMEWORK SUBMISSION) -->
+    <section id="proof-of-testing" class="space-y-6 scroll-mt-24">
+      <div class="flex items-center justify-between border-b border-indigo-500/50 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 text-white flex items-center justify-center font-bold shadow-lg shadow-indigo-500/30">
+            <i class="fa-solid fa-certificate"></i>
+          </div>
+          <div>
+            <span class="text-xs uppercase font-extrabold text-indigo-400 tracking-wider">作業評分核心展示區</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white">第 5 章：實測證明與對話成果展示</h2>
+          </div>
+        </div>
+        <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 實測通過
+        </span>
+      </div>
+
+      <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-indigo-200 text-sm flex items-start gap-3">
+        <i class="fa-solid fa-circle-info text-indigo-400 mt-0.5 text-base"></i>
+        <div>
+          <strong>【作業線上文字填寫說明】</strong>：本章節為作業規範要求之<strong>實測證明專區</strong>。展示系統在真實 Telegram 環境下的對話、狀態指令、錯誤攔截與修復成果截圖。
+        </div>
+      </div>
+
+      <!-- Proof Grid -->
+      <div class="grid md:grid-cols-2 gap-8">
+
+        <!-- Proof Card 1 -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-700/80 shadow-xl space-y-4 p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">實測證明 01</span>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">指令響應測試</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">/status 與 /help 狀態監控實測</h3>
+          <p class="text-xs text-slate-400">
+            測試 Bot 系統狀態指令與白名單過濾機制。顯示當前綁定之試算表、今日配額使用狀況（如 5/50 次）與授權狀態。
+          </p>
+          <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/50">
+            <img src="assets/proof_02_status_command.png" alt="Status 指令實測截圖" class="w-full h-auto object-cover hover:scale-105 transition duration-300">
+          </div>
+          <div class="text-xs text-emerald-400 flex items-center gap-1.5 pt-2">
+            <i class="fa-solid fa-check-circle"></i> 驗證結果：狀態即時讀取成功，配額數據準確反映。
+          </div>
+        </div>
+
+        <!-- Proof Card 2 -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-700/80 shadow-xl space-y-4 p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">實測證明 02</span>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">格式修復實測</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">智慧書籍推薦與排版渲染實測</h3>
+          <p class="text-xs text-slate-400">
+            向 Bot 提問「請推薦一本好書」，驗證 Markdown 轉 HTML 語法轉換器，標題、引言與重點條列皆以高質感格式呈現。
+          </p>
+          <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/50">
+            <img src="assets/proof_05_book_recommendation.png" alt="書籍推薦格式實測截圖" class="w-full h-auto object-cover hover:scale-105 transition duration-300">
+          </div>
+          <div class="text-xs text-emerald-400 flex items-center gap-1.5 pt-2">
+            <i class="fa-solid fa-check-circle"></i> 驗證結果：格式優雅排版，徹底解決 raw markdown 亂碼問題。
+          </div>
+        </div>
+
+        <!-- Proof Card 3 -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-700/80 shadow-xl space-y-4 p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">實測證明 03</span>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">容錯與防重擊</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">Webhook 去重與錯誤分析處理實測</h3>
+          <p class="text-xs text-slate-400">
+            實測在高延遲或網路波動時，Telegram Webhook Update ID 去重機制成功攔截重發請求，並能在發生錯誤時給予精確分析。
+          </p>
+          <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/50">
+            <img src="assets/proof_06_error_analysis.png" alt="錯誤分析與處理實測截圖" class="w-full h-auto object-cover hover:scale-105 transition duration-300">
+          </div>
+          <div class="text-xs text-emerald-400 flex items-center gap-1.5 pt-2">
+            <i class="fa-solid fa-check-circle"></i> 驗證結果：無重複狂發訊息，各類錯誤碼皆能給出友善診斷。
+          </div>
+        </div>
+
+        <!-- Proof Card 4 -->
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-700/80 shadow-xl space-y-4 p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">實測證明 04</span>
+            <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">突破長文限制</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">長篇深入分析與多輪「繼續」接續實測</h3>
+          <p class="text-xs text-slate-400">
+            測試超長篇主題回答。當回答接近 Token 上限時，Bot 主動附帶接續標註，用戶回覆「繼續」即可順暢接續未完論述。
+          </p>
+          <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/50">
+            <img src="assets/proof_07_continuation_reply.png" alt="多輪繼續接續回答實測截圖" class="w-full h-auto object-cover hover:scale-105 transition duration-300">
+          </div>
+          <div class="text-xs text-emerald-400 flex items-center gap-1.5 pt-2">
+            <i class="fa-solid fa-check-circle"></i> 驗證結果：對話記憶串接無縫，成功完成完整長篇論述輸出。
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Additional Proof: Search Grounding & Time Injection -->
+      <div class="glass-card p-6 rounded-2xl border border-indigo-500/30 space-y-4">
+        <div class="flex items-center justify-between">
+          <h4 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-magnifying-glass-chart text-indigo-400"></i>
+            進階實測：Search Grounding 429 降級與 2026 年時間認知實測
+          </h4>
+          <span class="text-xs bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded-full font-semibold">v1.7.0 突破</span>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          針對實測中發生的「開啟搜尋後 Google 回傳 429 配額不足」以及「AI 誤認今年為 2025 年」之問題，進行升級驗證。系統在背景自動降級重試，並透過真實系統時鐘注入 Taipei 2026 年時序，使 AI 能正確辨別當前時間。
+        </p>
+        <div class="rounded-xl overflow-hidden border border-slate-800 max-w-2xl mx-auto">
+          <img src="assets/proof_08_search_429_year2025.png" alt="429 降級與時間基準實測截圖" class="w-full h-auto object-cover">
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Pending Issues & Future Work -->
+    <section id="pending-issues" class="space-y-6">
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">6</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">第一版待改善問題與第二版規劃</h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="glass-card p-5 rounded-xl border-t-4 border-t-amber-400 space-y-3">
+          <div class="font-bold text-amber-300 text-base flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> LINE Bot 雙軌介接
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>目前現況</strong>：第一版已於 Telegram Bot 上將完整的配額防護、Gemini 連線與試算表日誌驗證完畢。<br>
+            <strong>待改善規劃</strong>：第二版將在 `Main.gs` 新增 LINE Messaging API 的 Webhook 簽章驗證 (`X-Line-Signature`) 與訊息推送，達成 LINE 與 Telegram 雙平台同時支援。
+          </p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-t-4 border-t-cyan-400 space-y-3">
+          <div class="font-bold text-cyan-300 text-base flex items-center gap-2">
+            <i class="fa-solid fa-globe"></i> 官方聯網搜尋額度解鎖
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>目前現況</strong>：未綁定信用卡之 Google AI Studio 免費額度對 Search Grounding 配額為 0，第一版採 429 自動無感降級。<br>
+            <strong>待改善規劃</strong>：後續可綁定 Google Cloud Project 計費帳號以解鎖官方 Grounding 搜尋額度，或串接免費新聞 API (如 NewsAPI/DuckDuckGo) 提供自帶搜尋。
+          </p>
+        </div>
+
+        <div class="glass-card p-5 rounded-xl border-t-4 border-t-indigo-400 space-y-3">
+          <div class="font-bold text-indigo-300 text-base flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark"></i> Google Sheets 自訂知識庫 (RAG)
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>目前現況</strong>：目前試算表僅作為歷史問答日誌儲存。<br>
+            <strong>待改善規劃</strong>：第二版將在試算表開立「常見問答 (FAQ)」分頁，讓 Bot 在呼叫 Gemini 前優先檢索試算表專屬知識庫，打造個人化/企業化專屬客服機器人。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Conclusion & Deliverables -->
+    <section class="glass-card p-8 rounded-3xl border border-indigo-500/30 text-center space-y-6">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white">作業繳交成果確認清單</h2>
+      <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+        本專題第一版已如期完成，包含完整 GitHub 開源代碼、專題計畫書 PDF、展示簡報 PDF，以及全套開發避坑實測證明。
+      </p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto text-left text-xs">
+        <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+          <span class="text-emerald-400 font-bold block mb-1">✅ 專題計畫書</span>
+          <span class="text-slate-400">專題計畫書 PDF 已生成</span>
+        </div>
+        <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+          <span class="text-emerald-400 font-bold block mb-1">✅ 簡報 PDF</span>
+          <span class="text-slate-400">16:9 專題簡報 PDF 已生成</span>
+        </div>
+        <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+          <span class="text-emerald-400 font-bold block mb-1">✅ GitHub 專案</span>
+          <span class="text-slate-400">完整代碼、文檔與 Commit</span>
+        </div>
+        <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+          <span class="text-emerald-400 font-bold block mb-1">✅ 實測證明</span>
+          <span class="text-slate-400">詳見網頁第 5 章截圖展示</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-10 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <div>AI Vibe Coding 專題實作 — 智慧對話助理 Bot (第一版)</div>
+      <div class="flex items-center justify-center gap-4 text-slate-400">
+        <a href="https://github.com/chinkunlim/wk05_bot" target="_blank" class="hover:text-indigo-400 transition">GitHub Repository</a>
+        <span>•</span>
+        <a href="#proof-of-testing" class="hover:text-indigo-400 transition">實測證明專區</a>
+        <span>•</span>
+        <span>Google Apps Script & Gemini 2.5 Flash</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
