@@ -24,11 +24,12 @@
 | 檔案路徑 | 職責定義 | 規範與限制 |
 | :--- | :--- | :--- |
 | `src/Config.gs` | 設定與腳本屬性讀取 | 不寫死任何金鑰；只在此處定義全域常數與 `getEnv()` 屬性映射；支援動態 `GEMINI_MODEL`。 |
-| `src/Telegram.gs` | Telegram API 通訊 | 發送訊息必須考慮 4096 字元上限，並包含 HTML 格式解析錯誤的降級機制；封裝 Webhook 管理輔助函式。 |
+| `src/Telegram.gs` | Telegram API 通訊 | 發送訊息必須考慮 4096 字元上限，並包含 HTML 格式解析錯誤的降級機制；封裝 Webhook 管理輔助函式與 `editMessageText` 動態狀態更新。 |
+| `src/WebSearch.gs` | 雲端原生類 Grounding 檢索 | 透過 `UrlFetchApp` 抓取 Google News RSS，支援標點清洗、代名詞指代消歧義 (`expandQueryWithContext`) 與無關來源過濾 (`filterRelevantArticles`)。 |
 | `src/Gemini.gs` | Gemini API 串接 | 負責組裝多輪對話歷史，解析 `usageMetadata`，並處理 429、404 或安全防護過濾等例外；內建 `listGeminiModels()` 供快速偵測可用模型。 |
 | `src/QuotaManager.gs`| 存取控制與配額計數 | 以 `QUOTA_YYYY-MM-DD_userId` 為鍵存入 `ScriptProperties`，日期必須配合時區。 |
 | `src/Storage.gs` | 試算表日誌與快取 | 處理表頭初始化、行資料追加，以及與 `CacheService` 溝通的上下文序列化與反序列化。 |
-| `src/Main.gs` | 請求分派與指令路由 | 包含 `doPost` 與 `doGet`，嚴格執行身分檢驗 ➔ 指令解析 ➔ 配額檢驗 ➔ 呼叫 Gemini ➔ 日誌寫入的流水線。 |
+| `src/Main.gs` | 請求分派與指令路由 | 包含 `doPost` 與 `doGet`，嚴格執行身分檢驗 ➔ 指令解析 ➔ 漸進式狀態通知 ➔ 呼叫 Gemini ➔ 日誌寫入的流水線。 |
 
 ---
 
@@ -71,7 +72,7 @@
 node -e "
 const fs = require('fs');
 const vm = require('vm');
-const files = ['Config.gs', 'Telegram.gs', 'Gemini.gs', 'QuotaManager.gs', 'Storage.gs', 'Main.gs'];
+const files = ['Config.gs', 'Telegram.gs', 'WebSearch.gs', 'Gemini.gs', 'QuotaManager.gs', 'Storage.gs', 'Main.gs'];
 for (const file of files) {
   const code = fs.readFileSync('src/' + file, 'utf8');
   new vm.Script(code, { filename: file });

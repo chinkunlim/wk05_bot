@@ -74,3 +74,29 @@ Telegram 官方 Webhook 機制具備「重試政策 (Retry Policy)」：
 
 ### 4.2 HTML 標籤格式錯誤回退機制
 - **應對機制**：`_sendTelegramRequest` 內建自動降級重試機制。若 HTML 格式發送失敗，會自動退回純文字模式重新發送，確保訊息絕不遺失。
+
+---
+
+## 5. 即時資料檢索 (WebSearch) 限制與應對
+
+### 5.1 Google News RSS 覆蓋範疇限制
+- **現象**：查詢「這位老師在 Dcard 評價」時，Google News RSS 僅能涵蓋有被新聞報導之事件，對於社群論壇（如 Dcard、PTT）之私人討論串涵蓋有限。
+- **排解方式與優化**：
+  - 系統內建 `filterRelevantArticles`，若檢索之新聞未實質包含目標實體名稱（例如誤撈出銘傳大學、兒童美語等不相干報導），系統會主動剔除該雜訊，回覆末尾不貼不相關之參考來源。
+  - 第二版 (Phase 2) 規劃串接專用搜尋 API（如 Tavily 或 Google Custom Search API）補足校園社群討論之深度。
+
+### 5.2 多輪話題轉移後的代名詞指代殘留
+- **現象**：若在探討完「東華大學陳文盛老師」後，突然追問「他在哪裡比賽？」，系統可能仍保留前一主題之主詞。
+- **排解方式**：傳送 `/reset` 指令即可立即清除 20 分鐘對話快取，重啟全新主題討論。
+
+---
+
+## 6. 平臺特性差異與 LINE Bot 雙軌規劃
+
+### 6.1 第一版為何優先採用 Telegram Bot？
+1. **零成本推播**：Telegram Bot API 完全免費且無推播訊息次數限制；LINE Official Account 免費方案每月限制僅 200 則訊息，測試期容易迅速耗盡。
+2. **動態就地更新 (Progressive UX)**：Telegram 支援 `editMessageText` 原生訊息置換，能在 0.5 秒內發送「處理中/檢索中」動態看板並原地替換為答案；LINE Messaging API 不支援修改已發送訊息，必須發送多則獨立訊息，容易造成介面雜亂。
+3. **單則文字長度**：Telegram 單則支援 4096 字元並支援 HTML 排版；LINE 單則文字上限為 1000 字元且不支援 HTML。
+
+### 6.2 第二版 (Phase 2) LINE Bot 整合規劃
+- 第二版將在 `src/Main.gs` 新增 LINE Webhook 簽章驗證與 Reply API 支援，共用 `Gemini.gs`、`WebSearch.gs`、`Storage.gs` 與 `QuotaManager.gs` 核心業務邏輯，達成 Telegram & LINE 雙軌跨平臺部署。

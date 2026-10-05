@@ -247,43 +247,58 @@
       </div>
     </section>
 
-    <!-- Section 4: Dev Pitfalls & Lessons Learned -->
+    <!-- Section 4: AI Collaboration Experience -->
     <section id="dev-journey" class="space-y-6">
       <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
         <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">4</div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">AI 協作開發歷程與實務避坑指南</h2>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">AI 協作開發歷程與避坑經驗 (作業規範重點)</h2>
       </div>
 
-      <div class="glass-card p-6 rounded-2xl space-y-5 text-sm">
-        <div class="flex items-start gap-3">
-          <span class="px-2.5 py-1 rounded bg-red-500/20 text-red-400 font-mono text-xs font-bold mt-0.5">坑點 1</span>
-          <div>
-            <h4 class="font-bold text-white text-base">Telegram 訊息重複狂發風暴 (Retry Policy)</h4>
-            <p class="text-slate-400 mt-1">GAS 呼叫外部 API 超過 3 秒，Telegram 判定連線逾時啟動重試。解法：在 <code>Main.gs</code> 入口以 <code>CacheService</code> 鎖定 <code>update_id</code>，並強制立即回傳 200 OK 阻絕重發。</p>
-          </div>
+      <!-- AI Tools & Prompt Box -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+          <h3 class="text-lg font-bold text-indigo-300 flex items-center gap-2">
+            <i class="fa-solid fa-screwdriver-wrench"></i> 1. 使用之 AI 工具矩陣
+          </h3>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>開發環境與 Agent</strong>：Google Antigravity Agentic IDE (端到端自動化配對、檔案編修與本機語法校驗)</li>
+            <li>• <strong>核心推論大模型</strong>：Gemini 2.5 Flash (<code>gemini-2.5-flash</code>，兼具 8192 Token、零延遲與寬裕免費額度)</li>
+            <li>• <strong>架構設計與輔助生成</strong>：Claude 3.7 Sonnet (協助模組解耦、Regex 清洗規則與型態檢查)</li>
+          </ul>
         </div>
 
-        <div class="border-t border-slate-800 pt-4 flex items-start gap-3">
-          <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-xs font-bold mt-0.5">坑點 2</span>
-          <div>
-            <h4 class="font-bold text-white text-base">Google Search Grounding 429 配額陷阱與 2025 年盲點</h4>
-            <p class="text-slate-400 mt-1">未綁信用卡免費專案的 Google Search 配額為 0，開搜尋即報 429。解法：改由 GAS <code>UrlFetchApp</code> 自主抓取新聞 RSS，並在 System Instruction 注入當前台北時間（2026年）。</p>
-          </div>
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+          <h3 class="text-lg font-bold text-indigo-300 flex items-center gap-2">
+            <i class="fa-solid fa-terminal"></i> 2. 代表性 Prompt 提示詞範例
+          </h3>
+          <pre class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-[11px] text-indigo-200 overflow-x-auto whitespace-pre-wrap leading-normal font-mono">「要解決免費版 Gemini API 無法直接使用內建 Google Search Grounding 的 429 限制，在維持 100% 免費架構下，請幫我使用 Google Apps Script (GAS) 的 UrlFetchApp 抓取 Google News RSS 即時新聞，過濾雜訊後注入到 Prompt 作為背景 Context。同時為 Telegram Bot 加入 editMessageText 漸進式狀態通知（收到、檢索中、思考中），並在發生未預期錯誤時以透明方式向用戶報警。」</pre>
         </div>
+      </div>
 
-        <div class="border-t border-slate-800 pt-4 flex items-start gap-3">
-          <span class="px-2.5 py-1 rounded bg-purple-500/20 text-purple-400 font-mono text-xs font-bold mt-0.5">坑點 3</span>
-          <div>
-            <h4 class="font-bold text-white text-base">靜默失敗 (Silent Failure) 與無反應問題</h4>
-            <p class="text-slate-400 mt-1">因 <code>doPost</code> 外層 catch 吞掉錯誤，遇到 <code>env is not defined</code> 時用戶只看到完全無反應。解法：引入全域錯誤透傳通知與 <code>editMessageText</code> 即時狀態更新。</p>
-          </div>
+      <!-- Human-in-the-loop Correction Experience -->
+      <div class="glass-card p-6 rounded-2xl border-l-4 border-l-pink-500 space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded bg-pink-500/20 text-pink-400 font-mono text-xs font-bold">深刻實例</span>
+          <h3 class="text-lg font-bold text-white">3. 一次檢查並修正 AI 產出的真實深刻經驗</h3>
         </div>
+        <div class="text-xs text-slate-300 space-y-2 leading-relaxed">
+          <p>• <strong>問題發現 (AI 的邏輯盲點)</strong>：在第四輪實測追問「這位老師的課在 Dcard 的評價是什麼？」時，AI 初版產出的代碼僅單純依使用者輸入進行檢索，而 Google News RSS 在缺乏主詞情況下，誤撈出「銘傳大學通識講座」與「兒童線上英語營隊」等不相關報導。AI 未做內容相關性校驗，竟直接將這些錯誤網址附在回答末尾的「參考來源」中，造成嚴重的<strong>張冠李戴、來源不相干</strong>！</p>
+          <p>• <strong>人工介入排查與修正</strong>：我們透過 Telegram 實測截圖與 Google Sheets 日誌，精確指出代名詞指代失真與未過濾雜訊之缺陷。要求重新重構：(1) 實裝 <code>expandQueryWithContext()</code> 自動回溯上一輪記憶提煉「東華大學 陳文盛」補足主詞；(2) 實裝 <code>filterRelevantArticles()</code> 逐篇校驗新聞標題與摘要是否包含實體關鍵字，未命中者全數剔除，絕不向用戶貼出錯誤連結。</p>
+          <p>• <strong>重新驗證成效</strong>：重新測試後，AI 不僅精確回覆陳老師在校內的開課評價與教學風格，且末尾完全排除雜訊來源，達到圖文與資訊 100% 精準吻合！</p>
+        </div>
+      </div>
 
-        <div class="border-t border-slate-800 pt-4 flex items-start gap-3">
-          <span class="px-2.5 py-1 rounded bg-pink-500/20 text-pink-400 font-mono text-xs font-bold mt-0.5">坑點 4</span>
-          <div>
-            <h4 class="font-bold text-white text-base">代名詞消歧失真與來源張冠李戴</h4>
-            <p class="text-slate-400 mt-1">追問「這位老師在 Dcard 評價」時，因遺漏主詞而搜出「兒童英語課程推薦 Dcard」，末尾強貼無關連結。解法：實裝上下文代名詞補全與嚴格實體相關性校驗。</p>
+      <!-- Pitfalls Grid -->
+      <div class="glass-card p-6 rounded-2xl space-y-4 text-xs">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider text-slate-400">其他工程避坑紀錄</h3>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+            <span class="text-red-400 font-bold block mb-1">避坑 1：Telegram Webhook 狂發重試風暴</span>
+            <p class="text-slate-400">GAS 耗時超過 3 秒觸發 Telegram 逾時重發。解法：在 <code>Main.gs</code> 入口以 <code>CacheService</code> 鎖定 <code>update_id</code> 阻絕重發。</p>
+          </div>
+          <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+            <span class="text-red-400 font-bold block mb-1">避坑 2：全域變數作用域與靜默失敗</span>
+            <p class="text-slate-400">變數 <code>env</code> 遺漏宣告導致靜默無反應。解法：補正宣告並建立全域異常捕獲與 Telegram 原地報警機制。</p>
           </div>
         </div>
       </div>
@@ -302,15 +317,67 @@
           </div>
         </div>
         <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3.5 py-1.5 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 實測通過驗證
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 三大情境全數親測通過
         </span>
       </div>
 
-      <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-indigo-200 text-sm flex items-start gap-3">
+      <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-indigo-200 text-xs sm:text-sm flex items-start gap-3">
         <i class="fa-solid fa-circle-info text-indigo-400 mt-0.5 text-base"></i>
         <div>
-          <strong>【線上文字填寫指引】</strong>：本章節為作業規範要求之<strong>實測證明專區</strong>。完整展示真實 Telegram 環境下的狀態指令、錯誤捕獲、時事檢索、多輪實體消歧與來源校驗實況截圖。
+          <strong>【線上文字填寫指引】</strong>：本專案未將 AI 回覆「完成了」當作證明，而是由開發者親自於真實上線環境完成測試，下表完整記錄<strong>「輸入內容、預期結果、實際結果」</strong>，並附有高清真實截圖為證。
         </div>
+      </div>
+
+      <!-- 3 Testing Scenarios Table (Strictly complying with Docx requirement) -->
+      <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/60 p-1">
+        <table class="w-full text-left text-xs text-slate-300 border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 bg-slate-950/80 text-slate-400">
+              <th class="p-3 font-semibold">測試類型 (作業規範)</th>
+              <th class="p-3 font-semibold">實際輸入內容</th>
+              <th class="p-3 font-semibold">預期結果</th>
+              <th class="p-3 font-semibold">實際測試結果 (含佐證截圖)</th>
+              <th class="p-3 font-semibold text-center">判定</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 font-mono text-[11px]">
+            <tr class="hover:bg-slate-800/30">
+              <td class="p-3 font-sans font-bold text-sky-300">1. 正常使用<br><span class="text-[10px] text-slate-500 font-normal">(即時時事與類 Grounding)</span></td>
+              <td class="p-3 text-slate-200">台灣在杭州亞運獲得多少面金牌？</td>
+              <td class="p-3 text-slate-400 font-sans">0.5秒內顯示狀態通知，抓取即時新聞回覆精確獎牌數並附來源。</td>
+              <td class="p-3 text-emerald-300 font-sans"><strong>完美通過</strong>：回覆「19面金牌、20面銀牌、28面銅牌，總計67面獎牌，追平隊史最佳紀錄」，並附上真實時事新聞連結。<br><span class="text-slate-500 text-[10px]">(佐證：實測證明 02, proof_10)</span></td>
+              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">✅ 成功</span></td>
+            </tr>
+            <tr class="hover:bg-slate-800/30">
+              <td class="p-3 font-sans font-bold text-sky-300">1. 正常使用<br><span class="text-[10px] text-slate-500 font-normal">(多輪上下文消歧)</span></td>
+              <td class="p-3 text-slate-200">東華大學通識教育中心的陳文盛老師。也是資工系的老師。他的開課計劃是什麼？</td>
+              <td class="p-3 text-slate-400 font-sans">克服同名生科退休教授干擾，精確定位授課 Python 的花中兼任講師並整理課綱。</td>
+              <td class="p-3 text-emerald-300 font-sans"><strong>完美通過</strong>：成功鎖定通識兼任講師，列出 115-1 預計開設之「Python程式設計入門」與運算思維課程大綱。<br><span class="text-slate-500 text-[10px]">(佐證：實測證明 03, proof_12, 13)</span></td>
+              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">✅ 成功</span></td>
+            </tr>
+            <tr class="hover:bg-slate-800/30">
+              <td class="p-3 font-sans font-bold text-amber-300">2. 輸入不完整<br><span class="text-[10px] text-slate-500 font-normal">(代名詞指代追問)</span></td>
+              <td class="p-3 text-slate-200">這位老師的課在 Dcard 的評價是什麼？<br><span class="text-[10px] text-slate-500">(接續陳老師對話，缺實體主詞)</span></td>
+              <td class="p-3 text-slate-400 font-sans">回溯記憶補足主詞，不因缺主詞而胡亂貼出無關外部新聞。</td>
+              <td class="p-3 text-emerald-300 font-sans"><strong>完美通過</strong>：<code>expandQueryWithContext</code> 自動補足主詞為「東華大學 陳文盛 Dcard 評價」；<code>filterRelevantArticles</code> 成功過濾無關兒童英文新聞，答案精準專注且未貼錯來源。<br><span class="text-slate-500 text-[10px]">(佐證：實測證明 04, 06, proof_14, 15)</span></td>
+              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">✅ 成功</span></td>
+            </tr>
+            <tr class="hover:bg-slate-800/30">
+              <td class="p-3 font-sans font-bold text-rose-300">3. 不支援的輸入<br><span class="text-[10px] text-slate-500 font-normal">(未授權身分攔截)</span></td>
+              <td class="p-3 text-slate-200">非白名單使用者傳送任何文字訊息</td>
+              <td class="p-3 text-slate-400 font-sans">阻絕外部 LLM API 呼叫，回傳白名單拒絕提示與該用戶 User ID。</td>
+              <td class="p-3 text-emerald-300 font-sans"><strong>完美通過</strong>：立即攔截並提示：「⛔ 抱歉，您尚未獲得授權使用此機器人。您的 Telegram User ID 為：xxxxxx，請聯繫管理者加入白名單。」<br><span class="text-slate-500 text-[10px]">(佐證：實測證明 01, proof_01)</span></td>
+              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">✅ 成功</span></td>
+            </tr>
+            <tr class="hover:bg-slate-800/30">
+              <td class="p-3 font-sans font-bold text-rose-300">3. 不支援的輸入<br><span class="text-[10px] text-slate-500 font-normal">(未支援指令)</span></td>
+              <td class="p-3 text-slate-200">/unknown_test</td>
+              <td class="p-3 text-slate-400 font-sans">腳本不崩潰，主動提供操作說明提示。</td>
+              <td class="p-3 text-emerald-300 font-sans"><strong>完美通過</strong>：平穩回傳 <code>/help</code> 選單，提示支援指令（`/start`, `/search`, `/news`, `/status`, `/reset`）。</td>
+              <td class="p-3 text-center"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">✅ 成功</span></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <!-- Proof Grid -->
