@@ -30,37 +30,45 @@ function shouldTriggerSearch(text) {
 }
 
 /**
- * 從使用者提問中提取核心搜尋關鍵字
+ * 從使用者提問中提取核心搜尋關鍵字 (智慧清洗標點與提問助詞)
  * @param {string} text 使用者輸入文字
  * @returns {string} 適合傳給搜尋引擎的精簡關鍵字
  */
 function extractSearchKeyword(text) {
-  if (!text) return '最新新聞';
+  if (!text) return '台灣 最新新聞';
   let query = text.trim();
 
   // 若為指令格式，取指令後的參數
   if (query.startsWith('/search') || query.startsWith('/news')) {
     query = query.replace(/^(\/search|\/news)\s*/i, '').trim();
-    if (query.length > 0) return query;
-    return '台灣 最新新聞';
+    if (query.length === 0) return '台灣 最新新聞';
   }
 
-  // 移除常見提問贅詞與助詞
+  // 1. 將所有標點符號與換行替換為單一空格
+  query = query.replace(/[。，！？!?,\.\n/；;:：]+/g, ' ');
+
+  // 2. 移除常見提問贅詞、助詞與問句語尾
   const stopPhrases = [
     '請問', '請告訴我', '我想知道', '你知道', '有沒有', '可以跟我說',
-    '幫我查', '幫我搜尋', '查詢', '一下', '什麼是', '是誰'
+    '幫我查', '幫我搜尋', '查詢', '一下', '什麼是', '是誰',
+    '有教哪些課', '開什麼課', '在哪些系', '評價是什麼', '評價如何',
+    '有哪些課', '推薦嗎', '好不好', '可以選嗎', '的老師', '也是'
   ];
 
   stopPhrases.forEach(phrase => {
-    query = query.replace(new RegExp(phrase, 'gi'), '');
+    query = query.replace(new RegExp(phrase, 'gi'), ' ');
   });
 
-  query = query.trim();
-  return query.length > 0 ? query : text.trim();
+  // 3. 整理詞彙與空白
+  const words = query.split(/\s+/).filter(w => w.length > 0);
+  if (words.length === 0) return '最新新聞';
+
+  // 若切分後詞彙過多（超過 5 個），只取前 4 個核心詞以提升搜尋引擎命中率
+  return words.slice(0, 4).join(' ');
 }
 
 /**
- * 透過 Google News RSS 抓取繁體中文即時新聞資料
+ * 透過 Google News RSS 抓取繁體中文即時新聞資料 (支援階梯式搜尋降級)
  * @param {string} query 搜尋關鍵字或問題
  * @param {number} maxResults 最多抓取篇數 (預設 4)
  * @returns {Object|null} 包含 contextText 與 sources 的資料物件，若失敗則回傳 null
@@ -69,8 +77,26 @@ function fetchLatestWebInfo(query, maxResults = 4) {
   const keyword = extractSearchKeyword(query);
   Logger.log(`🔍 [WebSearch] 準備為關鍵字進行即時檢索: "${keyword}"`);
 
-  // Google News RSS 繁體中文 (台灣) 搜尋端點
-  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(keyword)}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
+  let result = _executeRssSearch(keyword, maxResults);
+
+  // 若初次搜尋未獲取結果，且關鍵字包含多個詞組，嘗試以最具代表性的前兩個核心實體詞進行降級重試
+  if (!result) {
+    const tokens = keyword.split(' ');
+    if (tokens.length >= 3) {
+      const simplifiedKeyword = tokens.slice(0, 2).join(' ');
+      Logger.log(`🔄 [WebSearch] 初次檢索無結果，自動精簡核心詞進行降級搜尋: "${simplifiedKeyword}"`);
+      result = _executeRssSearch(simplifiedKeyword, maxResults);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * 執行 Google News RSS 網路請求與解析
+ */
+function _executeRssSearch(searchQuery, maxResults) {
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(searchQuery)}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
 
   try {
     const response = UrlFetchApp.fetch(rssUrl, {
@@ -88,7 +114,7 @@ function fetchLatestWebInfo(query, maxResults = 4) {
     }
 
     const xmlText = response.getContentText('UTF-8');
-    return parseAndCleanNewsRss(xmlText, maxResults, keyword);
+    return parseAndCleanNewsRss(xmlText, maxResults, searchQuery);
   } catch (error) {
     Logger.log(`❌ [WebSearch] 抓取即時資訊發生例外: ${error.message}`);
     return null;
