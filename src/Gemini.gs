@@ -51,8 +51,19 @@ function callGemini(userId, userPrompt) {
   const modelName = env.geminiModel || CONFIG.DEFAULT_GEMINI_MODEL;
   const url = `${CONFIG.GEMINI_API_BASE_URL}/${modelName}:generateContent?key=${env.geminiApiKey}`;
 
+  const timeZone = Session.getScriptTimeZone() || 'Asia/Taipei';
+  const currentDateStr = Utilities.formatDate(new Date(), timeZone, 'yyyy年MM月dd日');
+  const currentYearStr = Utilities.formatDate(new Date(), timeZone, 'yyyy');
+
   const payload = {
     contents: contents,
+    systemInstruction: {
+      parts: [
+        {
+          text: `【時間基準認知】\n現在真實世界的時間是：${currentDateStr}（台灣/台北時區）。\n在回答任何涉及「今年」、「今天」、「最近」或當前年份、日期之問題時，請務必以此真實時間為基準（當前年份為 ${currentYearStr} 年），切勿誤認當前年份為 2025 年或更早的年份。`
+        }
+      ]
+    },
     generationConfig: {
       temperature: 0.7,
       topK: 40,
@@ -96,6 +107,7 @@ function callGemini(userId, userPrompt) {
   };
 
   const maxRetries = 2;
+  let isGroundingFallback = false;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     if (attempt > 0) {
@@ -145,9 +157,14 @@ function callGemini(userId, userPrompt) {
           }
         });
 
-        const sourcesHtml = sources.length > 0
+        let sourcesHtml = sources.length > 0
           ? '\n\n🔍 <b>參考來源：</b>\n• ' + sources.slice(0, 4).join('\n• ')
           : '';
+
+        // 若是由於 429 降級為基礎模型回答，提示使用者
+        if (isGroundingFallback) {
+          sourcesHtml = '\n\n<i>ℹ️（註：Google 免費帳號未開通即時搜尋額度，本回答依據 AI 模型基礎知識庫為您解答）</i>';
+        }
 
         // 擷取 Token 消耗統計
         const usage = data.usageMetadata || {};
@@ -181,6 +198,15 @@ function callGemini(userId, userPrompt) {
           sourcesHtml: sourcesHtml,
           tokens: tokens
         };
+      }
+
+      // 若是因 Google Search Grounding 觸發的 429 配額限制或工具不支援錯誤，自動移除 tools 降級重發！
+      if (payload.tools && (statusCode === 429 || (statusCode === 400 && responseText.includes('tool')))) {
+        Logger.log(`⚠️ 偵測到 Google Search Grounding 額度限制 (HTTP ${statusCode})，自動降級為標準生成模式重試...`);
+        delete payload.tools;
+        options.payload = JSON.stringify(payload);
+        isGroundingFallback = true;
+        continue;
       }
 
       // 若遇到 Google 伺服器過載 (500, 502, 503, 504)，且還有重試次數，進行重試

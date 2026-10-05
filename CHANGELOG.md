@@ -5,12 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-05
+
+### Added
+- **Search Grounding 429 智慧無縫降級機制**：
+  - 當開啟 `ENABLE_GOOGLE_SEARCH` 但 Google 官方回傳 429 配額受限（免費未綁卡專案之 Search Grounding 配額為 0）時，程式**不再報錯中斷**，而是自動在背景秒移除 `tools` 降級為標準生成模式重新取得回覆。
+  - 徹底解決使用者在開啟搜尋功能時頻繁收到 429 Rate Limit 錯誤訊息的問題。
+- **動態真實世界時間注入 (`systemInstruction`)**：
+  - 透過 System Instruction 自動向模型注入台北即時年月日時間（如 `2026年10月05日`），徹底修正 AI 因訓練截斷而將「今年」誤認作 2025 年之時間認知盲點。
+
 ## [1.6.0] - 2026-10-05
 
 ### Added
 - **Google Search Grounding (即時聯網搜尋) 支援**：
   - 在 `Gemini.gs` 掛載 `google_search` 工具，賦予 AI 即時上網搜尋真實資料之能力。
-  - 遇到即時天氣（例如：花蓮今日降雨）、時事新聞、教授當前開課與人物資訊時，不再單純靠訓練資料接龍，而是能即時 Google 最新資訊並彙整回答。
 - **自動解析與附帶 Grounding 參考來源網址**：
   - 自動從 `groundingMetadata.groundingChunks` 提取網頁標題與連結，在回覆末尾自動生成可點擊之 `🔍 參考來源` 列表。
 - **靈活控制開關 (`ENABLE_GOOGLE_SEARCH`)**：
