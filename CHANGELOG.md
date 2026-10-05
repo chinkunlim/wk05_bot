@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.4] - 2026-10-05
+
+### Changed
+- **全面移除特定實體硬編碼，轉為 100% 通用開放式檢索架構 (Zero Hardcoding Principle)**：
+  - 徹底移除特定縣市座標字典、校名、教授名或特定主題硬編碼，確保能通用應對使用者的任意隨機提問。
+  - 採用通用 NLP 斷詞萃取器：自動清洗特殊標點、疑問助詞、時間贅詞與結構連接詞，保留最具辨識度的名詞詞組。
+  - 升級為「三階式通用搜尋降級 (3-Tier Fallback Search)」：精確多詞 ➔ 前二主詞 ➔ 第一核心詞廣度檢索。
+- **優化時間認知與通用引導式 System Instruction**：
+  - 修正過往僅強調時間基準導致模型在缺乏即時觀測數據時機械式回覆「無法連網獲取今天數據」的痛點。
+  - 指示模型在面對任意即時動態/觀測提問且缺乏即時外部數值時，主動以背景知識、常態趨勢與分析建議詳實作答，並友善引導權威即時查詢管道。
+
+### Added
+- **模型代號自動容錯正規化 (Model Name Normalization)**：
+  - 在 `src/Config.gs` 實作 `normalizeModelName`，自動容錯並轉換 `3.8 flash`、`3.8-flash`、`3.5-flash` 為標準 `gemini-X.X-flash` 格式，預防因空格或前綴遺漏引發的 Google HTTP 503 路由錯誤。
+
 ## [1.9.3] - 2026-10-05
 
 ### Fixed

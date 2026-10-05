@@ -80,180 +80,71 @@ function extractSearchKeyword(text) {
   }
 
   // 1. 將所有標點符號（包含頓號 、 句號 。 逗號 ， 問號 ？）與換行替換為單一空格
-  query = query.replace(/[。，！？!?,\.\n/；;:：、～~—_]+/g, ' ');
+  query = query.replace(/[。，！？!?,\.\n/；;:：、～~—_()（）「」『』《》#@+=*&^%$]+/g, ' ');
 
-  // 2. 移除常見提問贅詞、助詞、度量問句與語尾
+  // 2. 移除常見通用提問贅詞、助詞、度量問句與語尾（純通用規則，無硬編碼實體）
   const stopPhrases = [
     '請問', '請告訴我', '我想知道', '你知道', '有沒有', '可以跟我說',
-    '幫我查', '幫我搜尋', '查詢', '一下', '什麼是', '是誰',
-    '有教哪些課', '開什麼課', '在哪些系', '評價是什麼', '評價如何',
-    '有哪些課', '推薦嗎', '好不好', '可以選嗎', '的老師', '也是',
-    '是多少', '多少個', '多少面', '數量', '結果', '今年', '今年的', '最近', '目前',
-    '和資訊科技有關的', '有關的', '相關的'
+    '幫我查', '幫我搜尋', '搜尋', '查詢', '一下', '什麼是', '是誰',
+    '是多少', '多少個', '多少面', '數量', '結果', '如何', '怎麼樣',
+    '評價是什麼', '評價如何', '推薦嗎', '好不好', '可以選嗎',
+    '開什麼課', '有哪些課', '相關的', '有關的', '表現如何',
+    '今天的', '今天', '今日', '明天的', '明天', '昨天的', '昨天',
+    '今年的', '今年', '最近的', '最近', '最新的', '最新', '目前的', '目前', '現在'
   ];
 
   stopPhrases.forEach(phrase => {
     query = query.replace(new RegExp(phrase, 'gi'), ' ');
   });
 
-  // 3. 關鍵實體字詞強制分離（避免中文無空格時連成超長單句致搜尋失準）
-  const keyEntities = [
-    '台灣', '中華隊', '東華大學', '陳文盛', '通識課', '通識', '資工系', '花蓮高中', 'Dcard',
-    '杭州亞運', '名古屋亞運', '亞運會', '亞運', '奧運會', '奧運', '金牌', '銀牌', '銅牌', '獎牌',
-    '颱風', '天氣', '地震', '台積電', '美股'
-  ];
-
-  keyEntities.forEach(ent => {
-    if (query.includes(ent)) {
-      query = query.replace(new RegExp(ent, 'g'), ' ' + ent + ' ');
-    }
-  });
-
-  // 4. 清理無意義助詞並過濾
-  const particles = ['的', '了', '和', '與', '在', '之', '個', '嗎', '呢', '啊'];
+  // 3. 清理結構助詞與連接詞，留下最具資訊量之核心詞組
+  const particles = ['的', '了', '和', '與', '在', '之', '個', '嗎', '呢', '啊', '吧', '請'];
   let words = query.split(/\s+/)
     .map(w => w.replace(/^[的了與和在之個]+|[的了與和在之個]+$/g, ''))
     .filter(w => w.length > 0 && !particles.includes(w));
     
-  if (words.length === 0) return '台灣 最新新聞';
+  if (words.length === 0) return '最新新聞';
 
-  // 5. 去重並取前 4 個最具代表性的核心詞
+  // 4. 去重並取前 4 個最具代表性的核心搜尋詞
   const uniqueWords = [...new Set(words)];
   return uniqueWords.slice(0, 4).join(' ');
 }
 
 /**
- * 台灣主要縣市座標資料庫 (免金鑰即時氣象)
- */
-const TAIWAN_WEATHER_LOCATIONS = {
-  '花蓮': { lat: 23.99, lon: 121.60, name: '花蓮縣' },
-  '台北': { lat: 25.04, lon: 121.56, name: '台北市' },
-  '臺北': { lat: 25.04, lon: 121.56, name: '台北市' },
-  '新北': { lat: 25.01, lon: 121.46, name: '新北市' },
-  '桃園': { lat: 24.99, lon: 121.30, name: '桃園市' },
-  '台中': { lat: 24.15, lon: 120.67, name: '台中市' },
-  '臺中': { lat: 24.15, lon: 120.67, name: '台中市' },
-  '台南': { lat: 22.99, lon: 120.21, name: '台南市' },
-  '臺南': { lat: 22.99, lon: 120.21, name: '台南市' },
-  '高雄': { lat: 22.62, lon: 120.30, name: '高雄市' },
-  '宜蘭': { lat: 24.75, lon: 121.75, name: '宜蘭縣' },
-  '台東': { lat: 22.76, lon: 121.14, name: '台東縣' },
-  '臺東': { lat: 22.76, lon: 121.14, name: '台東縣' },
-  '新竹': { lat: 24.81, lon: 120.97, name: '新竹縣市' },
-  '苗栗': { lat: 24.56, lon: 120.82, name: '苗栗縣' },
-  '彰化': { lat: 24.08, lon: 120.54, name: '彰化縣' },
-  '南投': { lat: 23.91, lon: 120.69, name: '南投縣' },
-  '雲林': { lat: 23.71, lon: 120.43, name: '雲林縣' },
-  '嘉義': { lat: 23.48, lon: 120.45, name: '嘉義縣市' },
-  '屏東': { lat: 22.67, lon: 120.49, name: '屏東縣' },
-  '基隆': { lat: 25.13, lon: 121.74, name: '基隆市' },
-  '澎湖': { lat: 23.57, lon: 119.58, name: '澎湖縣' },
-  '金門': { lat: 24.44, lon: 118.32, name: '金門縣' },
-  '連江': { lat: 26.15, lon: 119.95, name: '連江馬祖' },
-  '馬祖': { lat: 26.15, lon: 119.95, name: '連江馬祖' }
-};
-
-/**
- * 檢查是否為天氣查詢，若命中則透過 Open-Meteo 取得即時數值氣象資料
- * @param {string} query 使用者輸入
- * @returns {Object|null} 包含 contextText 與 sources
- */
-function fetchLiveWeatherData(query) {
-  if (!query) return null;
-  const isWeatherQuery = /天氣|氣溫|下雨|降雨|氣象|預報|溫度/i.test(query);
-  if (!isWeatherQuery) return null;
-
-  // 辨識目標縣市
-  let targetCity = null;
-  for (const city in TAIWAN_WEATHER_LOCATIONS) {
-    if (query.includes(city)) {
-      targetCity = TAIWAN_WEATHER_LOCATIONS[city];
-      break;
-    }
-  }
-
-  // 若無特定提及縣市，預設為花蓮或台北
-  if (!targetCity) {
-    targetCity = query.includes('花蓮') ? TAIWAN_WEATHER_LOCATIONS['花蓮'] : TAIWAN_WEATHER_LOCATIONS['台北'];
-  }
-
-  try {
-    const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${targetCity.lat}&longitude=${targetCity.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTaipei`;
-    const response = UrlFetchApp.fetch(apiUrl, { muteHttpExceptions: true });
-    if (response.getResponseCode() !== 200) return null;
-
-    const data = JSON.parse(response.getContentText());
-    if (!data.current || !data.daily) return null;
-
-    const cur = data.current;
-    const daily = data.daily;
-    const weatherDesc = _mapWeatherCode(cur.weather_code);
-
-    const contextText = `【${targetCity.name}即時氣象觀測數據】\n` +
-      `• 目前即時氣溫：${cur.temperature_2m} °C (體感溫度：${cur.apparent_temperature} °C)\n` +
-      `• 今日預估最高氣溫：${daily.temperature_2m_max[0]} °C，最低氣溫：${daily.temperature_2m_min[0]} °C\n` +
-      `• 目前天候狀況：${weatherDesc}\n` +
-      `• 今日最高降雨機率：${daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0} %\n` +
-      `• 當前相對濕度：${cur.relative_humidity_2m} %\n` +
-      `（以上數據為即時氣象觀測資料，請根據此最新數據為使用者詳細分析今日天氣、穿著建議與攜帶雨具提示。）`;
-
-    const sources = [
-      { title: `${targetCity.name} 即時氣象觀測資料 (Open-Meteo)`, url: `https://open-meteo.com` },
-      { title: `交通部中央氣象署 (CWA) 官網`, url: `https://www.cwa.gov.tw` }
-    ];
-
-    Logger.log(`🌤️ [WebSearch] 成功獲取 ${targetCity.name} 即時氣象數據`);
-    return { contextText, sources };
-  } catch (err) {
-    Logger.log(`⚠️ 抓取即時氣象失敗: ${err.message}`);
-    return null;
-  }
-}
-
-function _mapWeatherCode(code) {
-  if (code === 0) return '晴朗無雲';
-  if ([1, 2].includes(code)) return '多雲時晴';
-  if (code === 3) return '陰天多雲';
-  if ([45, 48].includes(code)) return '有霧';
-  if ([51, 53, 55, 56, 57].includes(code)) return '毛毛雨/輕微陣雨';
-  if ([61, 63, 65, 80, 81, 82].includes(code)) return '局部短暫陣雨';
-  if ([71, 73, 75, 77].includes(code)) return '降雪';
-  if ([95, 96, 99].includes(code)) return '雷雨/強陣雨';
-  return '多雲偶有短暫陣雨';
-}
-
-/**
- * 透過 Google News RSS 抓取繁體中文即時新聞資料 (支援階梯式搜尋降級與相關性校驗)
+ * 透過 Google News RSS 抓取繁體中文即時新聞資料 (支援通用階梯式搜尋降級與相關性校驗)
  * @param {string} query 搜尋關鍵字或問題
  * @param {number} maxResults 最多抓取篇數 (預設 4)
  * @param {Array} [history] 對話歷史 (用於代詞消解)
  * @returns {Object|null} 包含 contextText 與 sources 的資料物件，若無相關結果則回傳 null
  */
 function fetchLatestWebInfo(query, maxResults = 4, history = null) {
-  // 0. 若為天氣氣象查詢，優先獲取即時數值氣象資料
-  const weatherResult = fetchLiveWeatherData(query);
-  if (weatherResult) {
-    return weatherResult;
-  }
-
   // 1. 若有對話歷史，先進行代詞補全
   const contextQuery = history ? expandQueryWithContext(query, history) : query;
   const keyword = extractSearchKeyword(contextQuery);
-  Logger.log(`🔍 [WebSearch] 準備為關鍵字進行即時檢索: "${keyword}"`);
+  Logger.log(`🔍 [WebSearch] 通用檢索關鍵字: "${keyword}"`);
 
+  // 第一階：精確多詞檢索
   let result = _executeRssSearch(keyword, maxResults);
 
-  // 2. 若初次搜尋未獲取結果，且關鍵字包含多個詞組，嘗試以最具代表性的前兩個核心實體詞進行降級重試
+  // 第二階：若初次無結果且包含多個詞組，進行通用降級搜尋 (取前兩大核心詞)
   if (!result) {
     const tokens = keyword.split(' ');
-    if (tokens.length >= 3) {
-      const simplifiedKeyword = tokens.slice(0, 2).join(' ');
-      Logger.log(`🔄 [WebSearch] 初次檢索無結果，自動精簡核心詞進行降級搜尋: "${simplifiedKeyword}"`);
-      result = _executeRssSearch(simplifiedKeyword, maxResults);
+    if (tokens.length >= 2) {
+      const broaderKeyword = tokens.slice(0, 2).join(' ');
+      Logger.log(`🔄 [WebSearch] 階梯式重試：降級搜尋 "${broaderKeyword}"...`);
+      result = _executeRssSearch(broaderKeyword, maxResults);
     }
   }
 
-  return result;
+  // 第三階：若仍無結果，以第一主詞進行最廣泛檢索
+  if (!result) {
+    const firstToken = keyword.split(' ')[0];
+    if (firstToken && firstToken.length >= 2) {
+      Logger.log(`🔄 [WebSearch] 階梯式重試：廣度搜尋 "${firstToken}"...`);
+      result = _executeRssSearch(firstToken, maxResults);
+    }
+  }
+
 }
 
 /**
