@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.3] - 2026-10-05
+
+### Fixed
+- **徹底杜絕空白回覆與幽靈訊息 (Non-empty Guard)**：
+  - 修復當觸發 Safety Filter 時，Gemini 回傳空字串但被系統誤判為 `success: true`，導致 Telegram 僅收到 `(本日已提問: 32/50)` 幽靈訊息之漏洞。
+  - 在 `Main.gs` 與 `Gemini.gs` 實作嚴格非空防禦，回覆為空時明確提示安全防護警語，不再送出空訊息。
+- **徹底根除多輪對話歷史污染 (Anti-Cache Poisoning)**：
+  - 嚴格禁止將空白回覆寫入 `CacheService` 短期對話快取。
+  - 在讀取歷史與組裝 API contents 前，全面過濾所有空回覆輪次，徹底解決「下一輪提問將前一輪空白問題合併一起回答」的混亂現象。
+- **放寬安全過濾門檻至 `BLOCK_ONLY_HIGH`**：
+  - 將 HARM 類別閾值自 `BLOCK_MEDIUM_AND_ABOVE` 調降至 `BLOCK_ONLY_HIGH`，避免合法的大學校園課程與教師評價詢問被誤殺為騷擾。
+
+### Added
+- **無效模型自動備援降級重試 (Model Auto-Fallback)**：
+  - 當使用者在屬性設定了不存在或尚未開放之模型（如 `3.8-flash`）導致 Google 回傳 HTTP 503 / 404 時，系統不再直接中斷報錯，而是自動切換為預設穩定模型 (`gemini-2.5-flash`) 重新取得答案，並於文末友善提醒用戶。
+
 ## [1.9.2] - 2026-10-05
 
 ### Added

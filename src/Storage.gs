@@ -98,7 +98,11 @@ function getConversationHistory(userId) {
     const cache = CacheService.getScriptCache();
     const cachedData = cache.get(`CHAT_HISTORY_${userId}`);
     if (cachedData) {
-      return JSON.parse(cachedData);
+      const parsed = JSON.parse(cachedData);
+      if (Array.isArray(parsed)) {
+        // 嚴格過濾掉任何 model 回覆為空的無效記錄
+        return parsed.filter(turn => turn && turn.user && turn.model && turn.model.trim().length > 0);
+      }
     }
   } catch (err) {
     Logger.log(`⚠️ 讀取對話快取失敗: ${err.message}`);
@@ -114,9 +118,11 @@ function getConversationHistory(userId) {
 function saveConversationHistory(userId, history) {
   try {
     const cache = CacheService.getScriptCache();
+    // 儲存前再次確保不含空回覆
+    const validHistory = history.filter(turn => turn && turn.user && turn.model && turn.model.trim().length > 0);
     cache.put(
       `CHAT_HISTORY_${userId}`,
-      JSON.stringify(history),
+      JSON.stringify(validHistory),
       CONFIG.CACHE_EXPIRATION_SECONDS
     );
   } catch (err) {

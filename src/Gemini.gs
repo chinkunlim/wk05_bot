@@ -27,14 +27,16 @@ function callGemini(userId, userPrompt, customGrounding = null) {
   // 格式: [{ role: 'user', parts: [{ text: '...' }] }, { role: 'model', parts: [{ text: '...' }] }]
   const contents = [];
   history.forEach(turn => {
-    contents.push({
-      role: 'user',
-      parts: [{ text: turn.user }]
-    });
-    contents.push({
-      role: 'model',
-      parts: [{ text: turn.model }]
-    });
+    if (turn && turn.user && turn.model && turn.model.trim()) {
+      contents.push({
+        role: 'user',
+        parts: [{ text: turn.user }]
+      });
+      contents.push({
+        role: 'model',
+        parts: [{ text: turn.model.trim() }]
+      });
+    }
   });
 
   // 檢查是否為「繼續」意圖 (例如：繼續、請繼續、continue、接著說 等)
@@ -78,19 +80,19 @@ function callGemini(userId, userPrompt, customGrounding = null) {
     safetySettings: [
       {
         category: "HARM_CATEGORY_HARASSMENT",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        threshold: "BLOCK_ONLY_HIGH"
       },
       {
         category: "HARM_CATEGORY_HATE_SPEECH",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        threshold: "BLOCK_ONLY_HIGH"
       },
       {
         category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        threshold: "BLOCK_ONLY_HIGH"
       },
       {
         category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        threshold: "BLOCK_ONLY_HIGH"
       }
     ]
   };
@@ -113,6 +115,7 @@ function callGemini(userId, userPrompt, customGrounding = null) {
 
   const maxRetries = 2;
   let isGroundingFallback = false;
+  let isModelFallback = false;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     if (attempt > 0) {
@@ -129,16 +132,36 @@ function callGemini(userId, userPrompt, customGrounding = null) {
       if (statusCode === 200) {
         // 擷取生成的文字內容
         const candidate = data.candidates && data.candidates[0];
-        if (!candidate || !candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+        if (!candidate) {
+          const blockReason = data.promptFeedback && data.promptFeedback.blockReason;
           return {
             success: false,
-            text: '⚠️ Gemini 沒有回傳任何內容（可能觸發了安全性過濾條件）。',
-            error: 'Empty or blocked candidate'
+            text: `⚠️ 提問內容觸發了安全性審查 (${blockReason || 'SAFETY'})，請調整問題用詞後重新嘗試。`,
+            error: 'Prompt blocked'
           };
         }
 
-        let replyText = candidate.content.parts.map(p => p.text).join('').trim();
+        let replyText = '';
+        if (candidate.content && candidate.content.parts) {
+          replyText = candidate.content.parts.map(p => p.text || '').join('').trim();
+        }
         const finishReason = candidate.finishReason || '';
+
+        // 嚴格非空防禦：若回覆為空字串，嚴禁當作成功！
+        if (!replyText) {
+          Logger.log(`⚠️ Gemini 回傳內容為空，finishReason: ${finishReason}`);
+          let emptyTip = '⚠️ AI 生成回覆為空，請重新提問。';
+          if (finishReason === 'SAFETY') {
+            emptyTip = '⚠️ 該提問內容涉及特定人物或隱私評價，觸發了 AI 安全隱私防護過濾機制，未能生成回覆。建議調整語句或換個角度提問。';
+          } else if (finishReason === 'RECITATION') {
+            emptyTip = '⚠️ 該提問可能涉及版權重製限制，觸發了引用防護。';
+          }
+          return {
+            success: false,
+            text: emptyTip,
+            error: `Empty response with finishReason: ${finishReason}`
+          };
+        }
 
         // 檢查是否因達到 Token 上限而被截斷
         if (finishReason === 'MAX_TOKENS') {
@@ -174,6 +197,11 @@ function callGemini(userId, userPrompt, customGrounding = null) {
           sourcesHtml = '\n\n<i>ℹ️（註：Google 免費帳號未開通即時搜尋額度，本回答依據 AI 模型基礎知識庫為您解答）</i>';
         }
 
+        // 若觸發了模型自動備援降級，貼心提示使用者
+        if (isModelFallback) {
+          sourcesHtml += `\n\n<i>ℹ️（提示：自訂模型「${modelName}」無回應或未上線，系統已自動切換為預設穩定模型「${CONFIG.DEFAULT_GEMINI_MODEL}」解答）</i>`;
+        }
+
         // 擷取 Token 消耗統計
         const usage = data.usageMetadata || {};
         const tokens = {
@@ -182,13 +210,13 @@ function callGemini(userId, userPrompt, customGrounding = null) {
           totalTokens: usage.totalTokenCount || 0
         };
 
-        // 3. 更新對話歷史記憶
+        // 3. 更新對話歷史記憶 (嚴格確保不存入空內容)
         if (isContinuation && history.length > 0) {
           // 若為「繼續」操作，將新內容無縫追加到前一次回答末尾，並移除先前的中斷提示
           const lastTurn = history[history.length - 1];
           const cleanedLastModel = lastTurn.model.replace(/\n\n<i>⚠️（因回答內容較長中斷，請直接回覆「繼續」讓我接著回答）<\/i>/g, '');
           lastTurn.model = cleanedLastModel + '\n' + replyText;
-        } else {
+        } else if (replyText) {
           history.push({
             user: userPrompt,
             model: replyText
@@ -217,6 +245,14 @@ function callGemini(userId, userPrompt, customGrounding = null) {
         continue;
       }
 
+      // 若是因自訂模型不存在或端點不可用 (503 或 404)，且自訂模型不等於預設模型，進行自動容錯降級重試！
+      if ((statusCode === 503 || statusCode === 404) && modelName !== CONFIG.DEFAULT_GEMINI_MODEL && !isModelFallback) {
+        Logger.log(`⚠️ 自訂模型「${modelName}」請求失敗 (HTTP ${statusCode})，自動切換為預設穩定模型「${CONFIG.DEFAULT_GEMINI_MODEL}」重試...`);
+        isModelFallback = true;
+        url = `${CONFIG.GEMINI_API_BASE_URL}/${CONFIG.DEFAULT_GEMINI_MODEL}:generateContent?key=${env.geminiApiKey}`;
+        continue;
+      }
+
       // 若遇到 Google 伺服器過載 (500, 502, 503, 504)，且還有重試次數，進行重試
       if ([500, 502, 503, 504].includes(statusCode) && attempt < maxRetries) {
         Logger.log(`⚠️ Gemini 伺服器繁忙 (HTTP ${statusCode})，準備重試...`);
@@ -227,7 +263,7 @@ function callGemini(userId, userPrompt, customGrounding = null) {
       Logger.log(`❌ Gemini API 錯誤 (${statusCode}) [模型: ${modelName}]: ${responseText}`);
       let userFriendlyMsg = `抱歉，Gemini 服務異常 (HTTP ${statusCode})。`;
       if (statusCode === 503 || statusCode === 500) {
-        userFriendlyMsg = `⚠️ Google Gemini 伺服器目前繁忙過載 (HTTP ${statusCode} Overloaded)，請稍候 5~10 秒後再問一次！`;
+        userFriendlyMsg = `⚠️ Google Gemini 伺服器目前繁忙過載 (HTTP ${statusCode})，或模型「${modelName}」端點未開放。\n請稍候 5~10 秒後重試，或至 GAS 執行 listGeminiModels() 檢查可用模型代號。`;
       } else if (statusCode === 429) {
         userFriendlyMsg = '⚠️ Gemini API 免費額度頻率受限 (HTTP 429 Rate Limit)，請稍候 1~2 分鐘後再試。';
       } else if (statusCode === 404) {

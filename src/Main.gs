@@ -149,10 +149,17 @@ function doPost(e) {
       });
 
       // 8. 回覆 Telegram：將 Gemini 的 Markdown 轉換為美觀 HTML，並附加來源與本日額度
-      const formattedText = markdownToTelegramHtml(geminiResult.text);
+      const formattedText = markdownToTelegramHtml(geminiResult.text || '');
       const sources = geminiResult.sourcesHtml || '';
       const footer = `\n\n<i>(本日已提問: ${quota.currentCount}/${quota.maxRequests})</i>`;
-      const replyContent = formattedText + sources + footer;
+
+      // 雙重安全防禦：若內容本體為空，不發送純頁尾幽靈訊息
+      let replyContent;
+      if (!formattedText.trim() && !sources.trim()) {
+        replyContent = `⚠️ <b>AI 生成內容為空</b>\n\n未能取得有效回答，可能受到安全防護過濾。建議換個角度或調整提問用詞。\n${footer}`;
+      } else {
+        replyContent = formattedText + sources + footer;
+      }
 
       // 原地編輯替換狀態訊息（極致流暢，不洗版）
       let edited = false;
