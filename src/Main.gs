@@ -117,15 +117,16 @@ function doPost(e) {
     statusMsgId = sendTelegramMessage(chatId, initialStatusText, messageId);
     sendChatAction(chatId, 'typing');
 
-    // 5. 檢索增強 (類 Grounding)：若為時效意圖或搜尋指令，透過 GAS 抓取最新資訊
+    // 5. 檢索增強 (類 Grounding)：若為時效意圖或搜尋指令，透過 GAS 抓取最新資訊 (支援代詞上下文補全)
     let customGrounding = null;
     if (isSearchIntent) {
       try {
         Logger.log(`🌐 偵測到時效意圖，透過 GAS 發動即時檢索...`);
-        customGrounding = fetchLatestWebInfo(text, CONFIG.SEARCH_MAX_RESULTS || 4);
+        const history = getConversationHistory(userId);
+        customGrounding = fetchLatestWebInfo(text, CONFIG.SEARCH_MAX_RESULTS || 4, history);
         if (customGrounding && statusMsgId) {
-          // 檢索成功，更新狀態訊息提示模型彙整中
-          editTelegramMessage(chatId, statusMsgId, '🧠 即時資料檢索完成，正在分析彙整回答...');
+          // 檢索成功且通過相關性校驗，更新狀態訊息
+          editTelegramMessage(chatId, statusMsgId, `🧠 即時資料檢索完成，正在分析彙整回答...`);
           sendChatAction(chatId, 'typing');
         }
       } catch (searchErr) {

@@ -1,7 +1,7 @@
 /**
  * WebSearch.gs
- * Google Apps Script 雲端原生「類 Grounding」即時資料檢索系統
- * 透過 UrlFetchApp 抓取最新開放資料與新聞 RSS，過濾雜訊後注入 Gemini Prompt
+ * Google Apps Script 雲端原生「類 Grounding」即時資料檢索系統 (v1.9.2)
+ * 支援代名詞上下文補全 (Coreference Resolution)、Google News RSS 抓取與嚴格相關性校驗 (Relevance Filter)
  */
 
 /**
@@ -27,6 +27,41 @@ function shouldTriggerSearch(text) {
   ];
 
   return timeSensitiveKeywords.some(kw => trimmed.includes(kw));
+}
+
+/**
+ * 根據上下文對話歷史，自動消解代名詞並補全搜尋詞
+ * 例如「這位老師的課在 Dcard 評價如何？」+ 前輪「東華大學 陳文盛」➔ 補全為「東華大學 陳文盛 Dcard 評價」
+ * @param {string} text 使用者當前輸入
+ * @param {Array} history 對話歷史陣列
+ * @returns {string} 補全後的查詢字串
+ */
+function expandQueryWithContext(text, history) {
+  if (!text) return text;
+  if (!history || history.length === 0) return text;
+
+  // 檢查是否包含代名詞或指代詞
+  const pronounRegex = /(這(位|名|個)?(老師|教授|人|學校|課)?|他|她|它|該(老師|教授|學校|活動|單位)?)/i;
+  const hasPronoun = pronounRegex.test(text);
+
+  // 若提問很短（<= 12 字）或帶有代詞，嘗試從前一輪提取核心實體
+  if (hasPronoun || text.length <= 12) {
+    const lastTurn = history[history.length - 1];
+    const lastUserText = lastTurn.user || '';
+
+    // 從前一輪使用者的問題中萃取實體關鍵詞
+    const previousKeywords = extractSearchKeyword(lastUserText);
+    if (previousKeywords && previousKeywords !== '台灣 最新新聞') {
+      let cleanCurrent = text.replace(/^(\/search|\/news)\s*/i, '').trim();
+      cleanCurrent = cleanCurrent.replace(pronounRegex, '').trim();
+
+      const expanded = `${previousKeywords} ${cleanCurrent}`.trim();
+      Logger.log(`🔗 [WebSearch] 代詞消解補全: "${text}" ➔ "${expanded}"`);
+      return expanded;
+    }
+  }
+
+  return text;
 }
 
 /**
@@ -68,18 +103,21 @@ function extractSearchKeyword(text) {
 }
 
 /**
- * 透過 Google News RSS 抓取繁體中文即時新聞資料 (支援階梯式搜尋降級)
+ * 透過 Google News RSS 抓取繁體中文即時新聞資料 (支援階梯式搜尋降級與相關性校驗)
  * @param {string} query 搜尋關鍵字或問題
  * @param {number} maxResults 最多抓取篇數 (預設 4)
- * @returns {Object|null} 包含 contextText 與 sources 的資料物件，若失敗則回傳 null
+ * @param {Array} [history] 對話歷史 (用於代詞消解)
+ * @returns {Object|null} 包含 contextText 與 sources 的資料物件，若無相關結果則回傳 null
  */
-function fetchLatestWebInfo(query, maxResults = 4) {
-  const keyword = extractSearchKeyword(query);
+function fetchLatestWebInfo(query, maxResults = 4, history = null) {
+  // 1. 若有對話歷史，先進行代詞補全
+  const contextQuery = history ? expandQueryWithContext(query, history) : query;
+  const keyword = extractSearchKeyword(contextQuery);
   Logger.log(`🔍 [WebSearch] 準備為關鍵字進行即時檢索: "${keyword}"`);
 
   let result = _executeRssSearch(keyword, maxResults);
 
-  // 若初次搜尋未獲取結果，且關鍵字包含多個詞組，嘗試以最具代表性的前兩個核心實體詞進行降級重試
+  // 2. 若初次搜尋未獲取結果，且關鍵字包含多個詞組，嘗試以最具代表性的前兩個核心實體詞進行降級重試
   if (!result) {
     const tokens = keyword.split(' ');
     if (tokens.length >= 3) {
@@ -122,67 +160,105 @@ function _executeRssSearch(searchQuery, maxResults) {
 }
 
 /**
- * 解析 Google News RSS XML，清洗雜訊並精簡字數
+ * 嚴格相關性過濾：檢查檢索到的新聞是否真正包含核心查詢實體
+ * @param {Array} rawArticles 抓取到的原始新聞條目清單 [{ title, description, link, pubDate }]
+ * @param {string} searchKeyword 搜尋關鍵字
+ * @returns {Array} 通過相關性校驗的新聞清單
+ */
+function filterRelevantArticles(rawArticles, searchKeyword) {
+  if (!rawArticles || rawArticles.length === 0) return [];
+  if (!searchKeyword) return rawArticles;
+
+  // 提取具備實質意義的實體詞彙（長度 >= 2 的專有名詞，排除通配字）
+  const stopWords = ['最新', '新聞', '評價', '如何', '台灣', '今天', '今年', '什麼', 'dcard', 'ptt'];
+  const keyTokens = searchKeyword
+    .split(/\s+/)
+    .map(t => t.trim())
+    .filter(t => t.length >= 2 && !stopWords.includes(t.toLowerCase()));
+
+  // 若無特定實體名詞（例如純搜最新新聞），全部放行
+  if (keyTokens.length === 0) {
+    return rawArticles;
+  }
+
+  // 篩選新聞：標題或摘要必須包含至少一個核心實體關鍵詞
+  const relevant = rawArticles.filter(art => {
+    const content = (art.title + ' ' + art.description).toLowerCase();
+    return keyTokens.some(token => content.includes(token.toLowerCase()));
+  });
+
+  Logger.log(`🎯 [WebSearch] 相關性校驗: 原始 ${rawArticles.length} 則 ➔ 命中 ${relevant.length} 則 (實體詞: ${keyTokens.join(', ')})`);
+  return relevant;
+}
+
+/**
+ * 解析 Google News RSS XML，清洗雜訊並進行嚴格相關性過濾
  * @param {string} xmlText XML 原始文字
  * @param {number} maxResults 最多條數
  * @param {string} keyword 關鍵字
- * @returns {Object} { contextText, sources }
+ * @returns {Object|null} { contextText, sources }，若無相關新聞則回傳 null
  */
 function parseAndCleanNewsRss(xmlText, maxResults, keyword) {
-  const sources = [];
-  const articleSummaries = [];
+  const rawArticles = [];
 
   // 使用正則表達式高效提取 <item> 區塊，避免大型 XML 解析開銷
   const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
   let match;
-  let count = 0;
 
-  while ((match = itemRegex.exec(xmlText)) !== null && count < maxResults) {
+  while ((match = itemRegex.exec(xmlText)) !== null && rawArticles.length < 8) {
     const itemContent = match[1];
 
-    // 擷取標題
     const titleMatch = /<title>([\s\S]*?)<\/title>/i.exec(itemContent);
     let title = titleMatch ? decodeXmlEntities(titleMatch[1].trim()) : '';
 
-    // 擷取原始連結
     const linkMatch = /<link>([\s\S]*?)<\/link>/i.exec(itemContent);
     let link = linkMatch ? linkMatch[1].trim() : '';
 
-    // 擷取發布時間
     const pubDateMatch = /<pubDate>([\s\S]*?)<\/pubDate>/i.exec(itemContent);
     let pubDate = pubDateMatch ? pubDateMatch[1].trim() : '';
 
-    // 擷取摘要描述
     const descMatch = /<description>([\s\S]*?)<\/description>/i.exec(itemContent);
     let description = descMatch ? stripHtmlTags(decodeXmlEntities(descMatch[1])) : '';
 
     if (title) {
-      // 縮減長度保護 Token
       if (description.length > 200) {
         description = description.substring(0, 200) + '...';
       }
-
-      count++;
-      articleSummaries.push(
-        `【資訊 ${count}】\n標題：${title}\n時間：${pubDate}\n摘要：${description || '無詳細摘要'}`
-      );
-
-      sources.push({
+      rawArticles.push({
         title: title,
-        url: link
+        url: link,
+        pubDate: pubDate,
+        description: description
       });
     }
   }
 
-  if (sources.length === 0) {
-    Logger.log(`⚠️ [WebSearch] 未找到關鍵字 "${keyword}" 的相關即時新聞。`);
+  // 嚴格相關性過濾：若抓到的新聞與主詞無關（例如搜人名卻搜出兒童英語），直接剔除！
+  const relevantArticles = filterRelevantArticles(rawArticles, keyword);
+
+  if (relevantArticles.length === 0) {
+    Logger.log(`⚠️ [WebSearch] 檢索結果中無任何新聞與主詞 "${keyword}" 真正相關，判定為無效噪音並捨棄。`);
     return null;
   }
+
+  const finalArticles = relevantArticles.slice(0, maxResults);
+  const sources = [];
+  const articleSummaries = [];
+
+  finalArticles.forEach((art, idx) => {
+    articleSummaries.push(
+      `【資訊 ${idx + 1}】\n標題：${art.title}\n時間：${art.pubDate}\n摘要：${art.description || '無詳細摘要'}`
+    );
+    sources.push({
+      title: art.title,
+      url: art.url
+    });
+  });
 
   const contextText = `【檢索關鍵字】${keyword}\n【檢索時間】${Utilities.formatDate(new Date(), Session.getScriptTimeZone() || 'Asia/Taipei', 'yyyy-MM-dd HH:mm:ss')}\n\n` +
     articleSummaries.join('\n\n');
 
-  Logger.log(`✅ [WebSearch] 成功取得 ${sources.length} 則即時新聞資料`);
+  Logger.log(`✅ [WebSearch] 成功通過相關性校驗，提供 ${sources.length} 則即時相關資料`);
 
   return {
     keyword: keyword,
@@ -193,8 +269,6 @@ function parseAndCleanNewsRss(xmlText, maxResults, keyword) {
 
 /**
  * 去除字串中的 HTML 標籤
- * @param {string} html 帶有 HTML 標籤的字串
- * @returns {string} 純文字
  */
 function stripHtmlTags(html) {
   if (!html) return '';
@@ -203,8 +277,6 @@ function stripHtmlTags(html) {
 
 /**
  * 解碼常見 XML / HTML 實體符號
- * @param {string} str 包含實體的字串
- * @returns {string} 解碼後字串
  */
 function decodeXmlEntities(str) {
   if (!str) return '';
@@ -219,10 +291,9 @@ function decodeXmlEntities(str) {
 
 /**
  * 【開發者單元測試函式】
- * 在 GAS 編輯器中執行此函式，可直接在「執行記錄」中驗證即時檢索與過濾功能
  */
 function testCustomGrounding() {
-  const testQuery = '今天 台灣 最新新聞';
+  const testQuery = '台灣 最新新聞';
   Logger.log(`=== 測試類 Grounding 檢索: "${testQuery}" ===`);
 
   const result = fetchLatestWebInfo(testQuery, 3);

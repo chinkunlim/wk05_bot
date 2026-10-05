@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-10-05
+
+### Added
+- **上下文代名詞主詞自動補全 (Coreference Resolution)**：
+  - 解決追問「這位老師在 Dcard 評價」時代名詞指代失真之痛點。系統自動回溯上一輪對話，將「東華大學 陳文盛」核心實體自動補全至搜尋詞，生成精準查詢。
+- **嚴格相關性過濾機制 (Relevance Verification)**：
+  - 逐一校驗抓取到的新聞標題與摘要是否真正包含主詞實體關鍵詞。
+  - 若搜尋結果與提問主體無關（例如搜出「銘傳大學」、「兒童英文」），系統自動判定為無效雜訊並全數剔除，**回覆末尾絕對不貼無關來源連結**，徹底杜絕張冠李戴現象。
+
 ## [1.9.0] - 2026-10-05
 
 ### Added
