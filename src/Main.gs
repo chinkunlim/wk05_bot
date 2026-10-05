@@ -126,7 +126,8 @@ function doPost(e) {
         customGrounding = fetchLatestWebInfo(text, CONFIG.SEARCH_MAX_RESULTS || 4, history);
         if (customGrounding && statusMsgId) {
           // 檢索成功且通過相關性校驗，更新狀態訊息
-          editTelegramMessage(chatId, statusMsgId, `🧠 即時資料檢索完成，正在分析彙整回答...`);
+          const count = (customGrounding.sources && customGrounding.sources.length) || 0;
+          editTelegramMessage(chatId, statusMsgId, `🧠 即時資料檢索完成（成功獲取 ${count} 篇最新相關資訊），正在分析彙整回答...`);
           sendChatAction(chatId, 'typing');
         }
       } catch (searchErr) {

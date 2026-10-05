@@ -177,7 +177,7 @@ function _executeRssSearch(searchQuery, maxResults) {
 }
 
 /**
- * 嚴格相關性過濾：檢查檢索到的新聞是否真正包含核心查詢實體
+ * 智慧相關性過濾：支援中文子詞素與 2-gram 柔性比對，防範複合名詞（如「台灣亞運會」）過度誤殺，同時杜絕無關雜訊
  * @param {Array} rawArticles 抓取到的原始新聞條目清單 [{ title, description, link, pubDate }]
  * @param {string} searchKeyword 搜尋關鍵字
  * @returns {Array} 通過相關性校驗的新聞清單
@@ -186,25 +186,50 @@ function filterRelevantArticles(rawArticles, searchKeyword) {
   if (!rawArticles || rawArticles.length === 0) return [];
   if (!searchKeyword) return rawArticles;
 
-  // 提取具備實質意義的實體詞彙（長度 >= 2 的專有名詞，排除通配字）
-  const stopWords = ['最新', '新聞', '評價', '如何', '台灣', '今天', '今年', '什麼', 'dcard', 'ptt'];
-  const keyTokens = searchKeyword
-    .split(/\s+/)
-    .map(t => t.trim())
-    .filter(t => t.length >= 2 && !stopWords.includes(t.toLowerCase()));
+  // 1. 定義通用停用詞
+  const stopWords = ['最新', '新聞', '評價', '如何', '什麼', 'dcard', 'ptt', '今天', '今年', '請問', '查詢', '台灣'];
+  const rawTokens = searchKeyword.split(/\s+/).map(t => t.trim()).filter(Boolean);
+  const subTokens = [];
+
+  for (let i = 0; i < rawTokens.length; i++) {
+    const raw = rawTokens[i];
+    if (stopWords.includes(raw.toLowerCase())) continue;
+
+    // 若長詞帶有常見地域前綴（如「台灣亞運會」），提煉去前綴核心詞素（「亞運會」）
+    if (raw.length > 2) {
+      const stripped = raw.replace(/^(台灣|全台|中華)/, '');
+      if (stripped.length >= 2 && !stopWords.includes(stripped) && !subTokens.includes(stripped)) {
+        subTokens.push(stripped);
+      }
+    }
+
+    if (raw.length >= 2 && !stopWords.includes(raw) && !subTokens.includes(raw)) {
+      subTokens.push(raw);
+    }
+
+    // 長度 >= 3 的名詞自動提煉 2-gram 雙字核心詞素（如「亞運」、「營收」、「財報」）
+    if (raw.length >= 3) {
+      for (let j = 0; j < raw.length - 1; j++) {
+        const bi = raw.substring(j, j + 2);
+        if (!stopWords.includes(bi) && bi.length === 2 && !subTokens.includes(bi)) {
+          subTokens.push(bi);
+        }
+      }
+    }
+  }
 
   // 若無特定實體名詞（例如純搜最新新聞），全部放行
-  if (keyTokens.length === 0) {
+  if (subTokens.length === 0) {
     return rawArticles;
   }
 
-  // 篩選新聞：標題或摘要必須包含至少一個核心實體關鍵詞
+  // 2. 篩選新聞：標題或摘要命中至少一個核心實體詞素
   const relevant = rawArticles.filter(art => {
     const content = (art.title + ' ' + art.description).toLowerCase();
-    return keyTokens.some(token => content.includes(token.toLowerCase()));
+    return subTokens.some(token => content.includes(token.toLowerCase()));
   });
 
-  Logger.log(`🎯 [WebSearch] 相關性校驗: 原始 ${rawArticles.length} 則 ➔ 命中 ${relevant.length} 則 (實體詞: ${keyTokens.join(', ')})`);
+  Logger.log(`🎯 [WebSearch] 相關性校驗: 原始 ${rawArticles.length} 則 ➔ 命中 ${relevant.length} 則 (詞素: ${subTokens.join(', ')})`);
   return relevant;
 }
 

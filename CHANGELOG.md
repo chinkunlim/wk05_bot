@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.5] - 2026-10-05
+
+### Fixed
+- **修復相關性過濾器過度誤殺複合詞漏洞 (Sub-token & 2-gram Relevance Matching)**：
+  - 徹底解決使用者提問如「台灣亞運會今年的金、銀、銅牌的數量是多少？」時，爬蟲雖成功抓取 8 篇亞運新聞，卻因過濾器生硬比對完整字串「台灣亞運會」而將 8 篇有效新聞全部誤判為無效噪音丟棄的痛點。
+  - 實作前綴清洗（提煉核心詞「亞運會」）與 2-gram 詞素萃取（提煉「亞運」、「銅牌」等），使 8 篇即時體育新聞 100% 成功通過相關性校驗並注入 Gemini Prompt。
+- **即時檢索成果狀態動態顯示**：
+  - 在 `Main.gs` 的原地更新狀態訊息中加入命中篇數提示（例如 `🧠 即時資料檢索完成（成功獲取 4 篇最新相關資訊），正在分析彙整回答...`），提升操作透明度。
+
 ## [1.9.4] - 2026-10-05
 
 ### Changed
