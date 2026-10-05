@@ -7,6 +7,10 @@
  * 處理來自 Telegram 的 Webhook POST 請求
  */
 function doPost(e) {
+  let chatId = null;
+  let messageId = null;
+  let statusMsgId = null;
+
   try {
     if (!e || !e.postData || !e.postData.contents) {
       return HtmlService.createHtmlOutput('No content');
@@ -33,8 +37,8 @@ function doPost(e) {
     }
 
     const msg = update.message;
-    const chatId = msg.chat.id;
-    const messageId = msg.message_id;
+    chatId = msg.chat.id;
+    messageId = msg.message_id;
     const userId = msg.from.id;
     const userName = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ') || msg.from.username || '匿名';
     const text = msg.text.trim();
@@ -103,21 +107,36 @@ function doPost(e) {
       return HtmlService.createHtmlOutput('Quota exceeded');
     }
 
-    // 4. 發送「正在輸入中」提示
+    // 4. 即時狀態回饋：傳送首條狀態訊息，讓使用者在 0.5 秒內掌握系統狀態
+    const isSearchIntent = env.enableCustomGrounding && shouldTriggerSearch(text);
+    const initialStatusText = isSearchIntent
+      ? '🔍 收到提問，正在為您檢索即時資料中...'
+      : '⏳ 收到提問，AI 思考生成中...';
+
+    statusMsgId = sendTelegramMessage(chatId, initialStatusText, messageId);
     sendChatAction(chatId, 'typing');
 
-    // 5. 檢索增強 (類 Grounding)：若開啟且偵測到時效意圖或搜尋指令，透過 GAS 抓取最新資訊
+    // 5. 檢索增強 (類 Grounding)：若為時效意圖或搜尋指令，透過 GAS 抓取最新資訊
     let customGrounding = null;
-    if (env.enableCustomGrounding && shouldTriggerSearch(text)) {
-      Logger.log(`🌐 偵測到時效意圖，透過 GAS 發動即時檢索...`);
-      customGrounding = fetchLatestWebInfo(text, CONFIG.SEARCH_MAX_RESULTS || 4);
+    if (isSearchIntent) {
+      try {
+        Logger.log(`🌐 偵測到時效意圖，透過 GAS 發動即時檢索...`);
+        customGrounding = fetchLatestWebInfo(text, CONFIG.SEARCH_MAX_RESULTS || 4);
+        if (customGrounding && statusMsgId) {
+          // 檢索成功，更新狀態訊息提示模型彙整中
+          editTelegramMessage(chatId, statusMsgId, '🧠 即時資料檢索完成，正在分析彙整回答...');
+          sendChatAction(chatId, 'typing');
+        }
+      } catch (searchErr) {
+        Logger.log(`⚠️ 外部即時檢索失敗，平滑降級為標準生成: ${searchErr.message}`);
+      }
     }
 
     // 6. 呼叫 Gemini API 取得回覆
     const geminiResult = callGemini(userId, text, customGrounding);
 
     if (geminiResult.success) {
-      // 6. 寫入問答日誌至 Google Sheets
+      // 7. 寫入問答日誌至 Google Sheets
       logInteraction({
         userId: userId,
         userName: userName,
@@ -127,22 +146,49 @@ function doPost(e) {
         dailyCount: quota.currentCount
       });
 
-      // 7. 回覆 Telegram (將 Gemini 的 Markdown 語法轉換為 Telegram 支援的美觀 HTML，並附帶參考來源)
+      // 8. 回覆 Telegram：將 Gemini 的 Markdown 轉換為美觀 HTML，並附加來源與本日額度
       const formattedText = markdownToTelegramHtml(geminiResult.text);
       const sources = geminiResult.sourcesHtml || '';
       const footer = `\n\n<i>(本日已提問: ${quota.currentCount}/${quota.maxRequests})</i>`;
       const replyContent = formattedText + sources + footer;
-      sendTelegramMessage(chatId, replyContent, messageId);
+
+      // 原地編輯替換狀態訊息（極致流暢，不洗版）
+      let edited = false;
+      if (statusMsgId) {
+        edited = editTelegramMessage(chatId, statusMsgId, replyContent);
+      }
+      // 若原地編輯失敗（如訊息超長），則作為新訊息送出
+      if (!edited) {
+        sendTelegramMessage(chatId, replyContent, messageId);
+      }
 
     } else {
-      // 呼叫失敗處理
-      sendTelegramMessage(chatId, geminiResult.text, messageId);
+      // 呼叫失敗處理：明確回報錯誤，終結無聲無息
+      const errorMsg = `❌ <b>回覆失敗</b>\n\n${geminiResult.text || '伺服器未回傳有效內容'}\n\n<i>請稍後再試或輸入 /help 查詢指令。</i>`;
+      if (statusMsgId) {
+        editTelegramMessage(chatId, statusMsgId, errorMsg);
+      } else {
+        sendTelegramMessage(chatId, errorMsg, messageId);
+      }
     }
 
     return HtmlService.createHtmlOutput('OK');
 
   } catch (err) {
     Logger.log(`❌ doPost 處理異常: ${err.message}`);
+    // 若捕獲全域異常，主動向 Telegram 回報具體原因
+    try {
+      const alertMsg = `❌ <b>系統處理異常</b>\n\n原因：<code>${err.message}</code>\n\n<i>請檢查網路或稍候重新嘗試。</i>`;
+      if (typeof chatId !== 'undefined' && chatId) {
+        if (typeof statusMsgId !== 'undefined' && statusMsgId) {
+          editTelegramMessage(chatId, statusMsgId, alertMsg);
+        } else {
+          sendTelegramMessage(chatId, alertMsg);
+        }
+      }
+    } catch (e) {
+      Logger.log(`❌ 發送錯誤通知失敗: ${e.message}`);
+    }
     return HtmlService.createHtmlOutput('Internal Error');
   }
 }

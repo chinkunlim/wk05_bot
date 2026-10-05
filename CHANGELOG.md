@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-05
+
+### Added
+- **即時狀態反饋系統 (Progressive Status Feedback)**：
+  - 封裝 Telegram `editMessageText` API，實現訊息原地動態切換。
+  - 使用者發送訊息後 **0.5 秒內即時收到狀態通知**（`🔍 正在檢索即時資料中...` 或 `⏳ 收到問題，AI 思考生成中...`），徹底終結「發送後不知是否成功」的盲等困擾。
+  - 檢索完成時平滑過渡為 `🧠 即時資料檢索完成，正在分析彙整回答...`，生成完畢後原地變身為最終答案，體驗極致流暢且絕不洗版。
+- **全域錯誤透明化機制 (Transparent Error Handling)**：
+  - 徹底消滅「靜默失敗（Silent Failure）」。
+  - 當遇到任何外部網路超時、API 錯誤或未預期例外時，主動將狀態訊息原地更新為「❌ 處理失敗：詳細錯誤原因」，讓使用者第一時間掌握系統狀態。
+
 ## [1.8.0] - 2026-10-05
 
 ### Added

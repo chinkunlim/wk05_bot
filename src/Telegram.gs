@@ -30,13 +30,14 @@ function sendTelegramMessage(chatId, text, replyToMessageId) {
     if (replyToMessageId) {
       payload.reply_to_message_id = replyToMessageId;
     }
-    _sendTelegramRequest(url, payload, text, chatId);
-    return;
+    const res = _sendTelegramRequest(url, payload, text, chatId);
+    return res && res.result ? res.result.message_id : null;
   }
 
   // 若文字超過 4000 字元，依段落或長度切片循序發送
   let remainingText = text;
   let isFirstChunk = true;
+  let firstMsgId = null;
 
   while (remainingText.length > 0) {
     let chunkSize = Math.min(MAX_CHUNK_LENGTH, remainingText.length);
@@ -61,14 +62,84 @@ function sendTelegramMessage(chatId, text, replyToMessageId) {
       payload.reply_to_message_id = replyToMessageId;
     }
 
-    _sendTelegramRequest(url, payload, chunk, chatId);
+    const res = _sendTelegramRequest(url, payload, chunk, chatId);
+    if (isFirstChunk && res && res.result) {
+      firstMsgId = res.result.message_id;
+    }
+
     isFirstChunk = false;
     Utilities.sleep(200); // 避免頻繁送出觸發 Telegram 限速
+  }
+  return firstMsgId;
+}
+
+/**
+ * 原地編輯 Telegram 訊息 (支援 HTML 降級)
+ * @param {string|number} chatId 聊天室 ID
+ * @param {number} messageId 要編輯的訊息 ID
+ * @param {string} text 新的訊息內容
+ * @returns {boolean} 是否編輯成功
+ */
+function editTelegramMessage(chatId, messageId, text) {
+  const env = getEnv();
+  if (!env.telegramToken || !messageId) return false;
+
+  const MAX_CHUNK_LENGTH = 4000;
+  // 若文字超長，無法在單一訊息中原地編輯，先編輯第一段並發送剩餘片段
+  if (text.length > MAX_CHUNK_LENGTH) {
+    const firstChunk = text.substring(0, MAX_CHUNK_LENGTH);
+    const restChunk = text.substring(MAX_CHUNK_LENGTH);
+    editTelegramMessage(chatId, messageId, firstChunk);
+    sendTelegramMessage(chatId, restChunk);
+    return true;
+  }
+
+  const url = `${CONFIG.TELEGRAM_API_BASE_URL}${env.telegramToken}/editMessageText`;
+  const payload = {
+    chat_id: chatId,
+    message_id: messageId,
+    text: text,
+    parse_mode: 'HTML',
+    disable_web_page_preview: false
+  };
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const result = JSON.parse(response.getContentText());
+    if (result.ok) {
+      return true;
+    }
+    Logger.log(`⚠️ editMessageText HTML 編輯警告: ${result.description}，嘗試純文字降級...`);
+    // 降級為純文字編輯
+    const fallbackOptions = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify({
+        chat_id: chatId,
+        message_id: messageId,
+        text: text
+      }),
+      muteHttpExceptions: true
+    };
+    const fallbackRes = UrlFetchApp.fetch(url, fallbackOptions);
+    const fallbackJson = JSON.parse(fallbackRes.getContentText());
+    return fallbackJson.ok;
+  } catch (err) {
+    Logger.log(`❌ editMessageText 失敗: ${err.message}`);
+    return false;
   }
 }
 
 /**
  * 內部通用發送請求 (若 HTML 解析失敗自動退回純文字發送)
+ * @returns {Object|null} Telegram API 回傳結果物件
  */
 function _sendTelegramRequest(url, payload, originalText, chatId) {
   const options = {
@@ -93,10 +164,13 @@ function _sendTelegramRequest(url, payload, originalText, chatId) {
         }),
         muteHttpExceptions: true
       };
-      UrlFetchApp.fetch(url, fallbackOptions);
+      const fallbackRes = UrlFetchApp.fetch(url, fallbackOptions);
+      return JSON.parse(fallbackRes.getContentText());
     }
+    return result;
   } catch (err) {
     Logger.log(`❌ Telegram 發送失敗: ${err.message}`);
+    return null;
   }
 }
 
