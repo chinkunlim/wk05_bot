@@ -696,6 +696,51 @@
             </div>
           </div>
         </div>
+
+        <!-- 第三階段實測截圖展示區 (輸入不完整容錯、模型備援降級與配額監控) -->
+        <div class="mt-4 pt-4 border-t border-slate-800 space-y-3">
+          <div class="text-xs font-bold text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-emerald-400"></i> 第三階段實測截圖佐證：輸入不完整引導、模型自動降級與即時額度監控
+          </div>
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/60 p-3 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-amber-400 font-semibold">1. 輸入不完整友善引導</span>
+                <span class="text-[10px] text-amber-300 font-mono">情境二 ✅</span>
+              </div>
+              <div class="rounded-lg overflow-hidden border border-slate-800">
+                <img src="assets/proof_20_incomplete_search_guidance.png" alt="輸入不完整指令引導" class="w-full h-auto object-cover">
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                輸入無參數 <code>/search</code> 時，系統自動偵測並友善提示具體用法範例，並顯示本日累計提問計數 (59/75)。
+              </p>
+            </div>
+            <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/60 p-3 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-sky-400 font-semibold">2. 智慧天氣與模型無縫降級</span>
+                <span class="text-[10px] text-sky-300 font-mono">自動備援 ✅</span>
+              </div>
+              <div class="rounded-lg overflow-hidden border border-slate-800">
+                <img src="assets/proof_21_incomplete_weather_and_fallback.png" alt="天氣指令與模型備援" class="w-full h-auto object-cover">
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                輸入 <code>/weather</code> 提示補充地區並科普秋季氣候；當 <code>gemini-3.5-flash</code> 未上線時，系統<strong>自動無縫切換穩定模型解答</strong>，不崩潰！
+              </p>
+            </div>
+            <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/60 p-3 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-emerald-400 font-semibold">3. 額度安全狀態即時監控</span>
+                <span class="text-[10px] text-emerald-300 font-mono">安全防護 ✅</span>
+              </div>
+              <div class="rounded-lg overflow-hidden border border-slate-800">
+                <img src="assets/proof_22_quota_status_check.png" alt="額度狀態查詢" class="w-full h-auto object-cover">
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                輸入 <code>/status</code> 即時顯示今日日期 (2026-10-05)、已用 61 次、剩餘 14 次、每日上限 75 次與午夜歸零說明，嚴格守護免費用量。
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 5. AI 協作紀錄與審查修正經驗 -->
