@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 徹底消滅「靜默失敗（Silent Failure）」。
   - 當遇到任何外部網路超時、API 錯誤或未預期例外時，主動將狀態訊息原地更新為「❌ 處理失敗：詳細錯誤原因」，讓使用者第一時間掌握系統狀態。
 
+### Fixed
+- **修正 `doPost` 變數作用域**：補齊 `const env = getEnv()` 宣告，徹底解決 `env is not defined` 運行時錯誤。
+
 ## [1.8.0] - 2026-10-05
 
 ### Added

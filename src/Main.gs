@@ -42,6 +42,7 @@ function doPost(e) {
     const userId = msg.from.id;
     const userName = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(' ') || msg.from.username || '匿名';
     const text = msg.text.trim();
+    const env = getEnv();
 
     // 1. 白名單安全驗證
     if (!isUserAuthorized(userId)) {
