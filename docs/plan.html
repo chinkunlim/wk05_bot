@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <title>專題計畫書 - Serverless AI 智慧對話助理 Bot (第一版)</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@600;900&family=JetBrains+Mono:wght@400;600&display=swap');
-
+    /* Native Apple system fonts for instant, zero-latency rendering */
     @page {
       size: A4;
       margin: 18mm 16mm 18mm 16mm;
@@ -23,10 +22,10 @@
     }
 
     body {
-      font-family: 'Noto Sans TC', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Heiti TC", "Noto Sans TC", sans-serif;
       color: #1e293b;
       line-height: 1.65;
-      font-size: 10.5pt;
+      font-size: 10pt;
       margin: 0;
       padding: 0;
       background: #ffffff;
@@ -38,7 +37,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 90vh;
+      min-height: 88vh;
       text-align: center;
       padding: 40px 20px;
     }
@@ -57,7 +56,7 @@
 
     .cover-title {
       font-family: 'Noto Serif TC', serif;
-      font-size: 26pt;
+      font-size: 25pt;
       font-weight: 900;
       color: #0f172a;
       line-height: 1.3;
@@ -65,27 +64,39 @@
     }
 
     .cover-subtitle {
-      font-size: 14pt;
+      font-size: 13pt;
       color: #475569;
       font-weight: 400;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
       max-width: 600px;
     }
 
+    .cover-alert {
+      background: #fffbeb;
+      border: 1px solid #fef3c7;
+      color: #92400e;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 9.5pt;
+      max-width: 550px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
     .cover-meta {
-      margin-top: 50px;
+      margin-top: 30px;
       width: 100%;
       max-width: 450px;
       border-top: 2px solid #e2e8f0;
-      padding-top: 24px;
+      padding-top: 20px;
       text-align: left;
-      font-size: 10.5pt;
+      font-size: 10pt;
     }
 
     .cover-meta-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
 
     .cover-meta-label {
@@ -104,64 +115,64 @@
     }
 
     h1 {
-      font-size: 16pt;
+      font-size: 15pt;
       border-left: 5px solid #4f46e5;
       padding-left: 12px;
-      margin-top: 30px;
-      margin-bottom: 16px;
+      margin-top: 24px;
+      margin-bottom: 12px;
       page-break-after: avoid;
     }
 
     h2 {
-      font-size: 12.5pt;
+      font-size: 12pt;
       color: #334155;
-      margin-top: 20px;
-      margin-bottom: 10px;
+      margin-top: 16px;
+      margin-bottom: 8px;
       page-break-after: avoid;
     }
 
     p {
       margin-top: 0;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       text-align: justify;
     }
 
     ul, ol {
       margin-top: 0;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       padding-left: 20px;
     }
 
     li {
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .card {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 16px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
     }
 
     .highlight-card {
       background: #eef2ff;
       border: 1px solid #c7d2fe;
       border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 16px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 18px;
-      font-size: 9.5pt;
+      margin-bottom: 16px;
+      font-size: 9pt;
     }
 
     th, td {
       border: 1px solid #cbd5e1;
-      padding: 8px 10px;
+      padding: 7px 9px;
       text-align: left;
     }
 
@@ -177,34 +188,25 @@
 
     .badge {
       display: inline-block;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 4px;
       font-size: 8pt;
       font-weight: 600;
     }
 
-    .badge-success {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .badge-progress {
-      background: #fef3c7;
-      color: #92400e;
-    }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-progress { background: #fef3c7; color: #92400e; }
 
     .code {
       font-family: 'JetBrains Mono', monospace;
       font-size: 8.5pt;
       background: #f1f5f9;
-      padding: 2px 5px;
+      padding: 2px 4px;
       border-radius: 4px;
       color: #0f172a;
     }
 
-    .page-break {
-      page-break-before: always;
-    }
+    .page-break { page-break-before: always; }
   </style>
 </head>
 <body>
@@ -212,8 +214,12 @@
   <!-- Cover Page -->
   <div class="cover">
     <div class="cover-badge">專題成果報告 ‧ 第一版實作</div>
-    <div class="cover-title">Serverless AI 智慧對話助理 Bot<br>第一版專題計畫與實作報告</div>
-    <div class="cover-subtitle">高安全性、免主機費託管與多重配額防護之對話助理實踐</div>
+    <div class="cover-title">AI 智慧對話助理 Bot 第一版<br>專題計畫與實作報告</div>
+    <div class="cover-subtitle">高安全性、免主機費託管、類 Grounding 即時檢索與多重配額防護之實踐</div>
+
+    <div class="cover-alert">
+      <strong>⚠️ 平台實施說明：</strong> 本專題原定 Chatbot 題目，第一版優先採用 <strong>Telegram Bot</strong> 作為核心落地平台，充分驗證 24/7 Serverless 架構、秒級狀態動態回饋 (<code>editMessageText</code>)、上下文實體消歧與即時資料檢索；LINE Messaging API 雙軌整合已納入第二版待改善擴充項目。
+    </div>
 
     <div class="cover-meta">
       <div class="cover-meta-row">
@@ -222,7 +228,11 @@
       </div>
       <div class="cover-meta-row">
         <span class="cover-meta-label">目前版本：</span>
-        <span class="cover-meta-value">v1.7.0 (第一版完整發布)</span>
+        <span class="cover-meta-value">v1.9.2 (第一版完整發布)</span>
+      </div>
+      <div class="cover-meta-row">
+        <span class="cover-meta-label">實作平台：</span>
+        <span class="cover-meta-value">Telegram Bot (第一版優先)</span>
       </div>
       <div class="cover-meta-row">
         <span class="cover-meta-label">核心技術棧：</span>
@@ -240,7 +250,7 @@
   </div>
 
   <!-- Page 2: Content -->
-  <h1>一、專題緣起與目標</h1>
+  <h1>一、專題緣起、平台選擇與核心目標</h1>
   <p>
     隨著大型語言模型（LLM）的普及，建置專屬智慧對話機器人已成為提升個人生產力與企業客服的核心手段。然而，現有許多教學範例常依賴 本機常駐（Local Node.js/Python）或付費雲端 VPS（AWS EC2、Heroku、Render），在實務運用中面臨<b>伺服器維護成本高</b>、<b>公開 Webhook 容易遭惡意刷取 API 配額</b>，以及<b>問答紀錄不易留存分析</b>等痛點。
   </p>
@@ -249,42 +259,47 @@
   </p>
 
   <div class="highlight-card">
-    <strong>專題三大核心宗旨：</strong>
+    <strong>為什麼第一版優先選擇 Telegram Bot 而非 LINE Bot？</strong>
     <ul>
-      <li><strong>零伺服器成本（Zero Cost）</strong>：運用 Google Apps Script (GAS) 24/7 官方無伺服器架構，徹底擺脫主機費。</li>
-      <li><strong>免費額度絕對保護（Quota Safety First）</strong>：雙重檢驗（白名單 ID + 每日配額計數器），未授權者無法耗損 API。</li>
-      <li><strong>全軌跡數據留存（Container-Bound Audit）</strong>：自動於關聯之 Google Sheets 記錄每筆對話歷程、時間與 Token 用量。</li>
+      <li><strong>長文支援度與原生 HTML 美化</strong>：Telegram 支援單則 4096 字元長訊息，並原生支援 HTML/Markdown 格式渲染，免除 LINE Flex Message 的繁瑣排版限制。</li>
+      <li><strong>原地動態更新體驗 (editMessageText)</strong>：Telegram 支援訊息原地編輯，使系統能在收到提問 0.5 秒內秒回「處理中/檢索中」，並在回答生成完畢後原地變身為完整回答，極致順暢且完全不洗版。</li>
+      <li><strong>零額外發送費用</strong>：無推送訊息每月則數計費壓力，最適合密集測試與學生免費用量。</li>
     </ul>
   </div>
 
   <h1>二、系統架構設計與模組劃分</h1>
   <p>
-    本系統採用微型無伺服器分層架構，所有程式碼均遵循 GAS V8 原生規範，禁止第三方 Node 依賴，確保無縫在瀏覽器雲端環境自主運行：
+    本系統採用微型無伺服器分層架構，所有程式碼均遵循 Google Apps Script (GAS) V8 原生規範，禁止第三方 Node 依賴，確保無縫在瀏覽器雲端環境自主運行：
   </p>
 
   <table>
     <thead>
       <tr>
-        <th style="width: 25%;">模組檔案</th>
-        <th style="width: 35%;">職責範圍</th>
-        <th style="width: 40%;">關鍵技術與設計亮點</th>
+        <th style="width: 23%;">模組檔案</th>
+        <th style="width: 32%;">職責範圍</th>
+        <th style="width: 45%;">關鍵技術與設計亮點</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><span class="code">src/Main.gs</span></td>
-        <td>請求分派與指令路由</td>
-        <td>Update ID 去重、白名單身分攔截、指令解析 (<span class="code">/start</span>, <span class="code">/status</span>, <span class="code">/reset</span>)。</td>
+        <td>請求分派與路由</td>
+        <td>Update ID 去重、白名單身分攔截、0.5秒秒級狀態通知、全域錯誤透明回報。</td>
+      </tr>
+      <tr>
+        <td><span class="code">src/WebSearch.gs</span></td>
+        <td>類 Grounding 檢索</td>
+        <td>Google News RSS 抓取、代名詞上下文補全、實體相關性校驗、階梯式降級搜尋。</td>
       </tr>
       <tr>
         <td><span class="code">src/Gemini.gs</span></td>
-        <td>Gemini API 串接與降級</td>
-        <td>支援 8192 Tokens、429 搜尋額度自動無感降級、動態注入當前台北真實時鐘基準。</td>
+        <td>Gemini API 通訊</td>
+        <td>8192 Tokens 支援、429 自動無感降級、動態注入 2026 年台北真實時鐘基準。</td>
       </tr>
       <tr>
         <td><span class="code">src/Telegram.gs</span></td>
-        <td>通訊協定與排版處理</td>
-        <td>長文自動分段、Markdown 轉 Telegram 原生 HTML 轉換器、未閉合標籤自動修復補齊。</td>
+        <td>通訊協定與排版</td>
+        <td><span class="code">editMessageText</span> 原地編輯、Markdown 轉 HTML、未閉合標籤自動補齊。</td>
       </tr>
       <tr>
         <td><span class="code">src/QuotaManager.gs</span></td>
@@ -306,16 +321,16 @@
 
   <div class="page-break"></div>
 
-  <h1>三、第一版目前進度與版本演進</h1>
+  <h1>三、第一版目前完成進度與功能矩陣 (v1.9.2)</h1>
   <p>
-    本專題歷經 7 次迭代更新，目前第一版（v1.7.0）已達到生產等級的高可用穩定度。功能完成度矩陣如下：
+    本專題歷經 9 次敏捷迭代，目前第一版（v1.9.2）已達到生產級的強韌穩定度。功能完成度如下：
   </p>
 
   <table>
     <thead>
       <tr>
-        <th>功能模組</th>
-        <th>第一版現況</th>
+        <th>功能項目</th>
+        <th>完成狀況</th>
         <th>狀態</th>
         <th>說明</th>
       </tr>
@@ -325,7 +340,7 @@
         <td><strong>GAS Webhook 接收與轉發</strong></td>
         <td>已完成</td>
         <td><span class="badge badge-success">通過</span></td>
-        <td>支援 HTTPS POST 請求，具備 200 OK 防重擊響應機制。</td>
+        <td>支援 HTTPS POST，具備 Update ID 快取防重擊機制。</td>
       </tr>
       <tr>
         <td><strong>Gemini 2.5 Flash 智慧對話</strong></td>
@@ -346,60 +361,72 @@
         <td>自動初始化表頭，寫入時間、UserID、問答與 Token 消耗。</td>
       </tr>
       <tr>
-        <td><strong>Telegram HTML 格式美化</strong></td>
+        <td><strong>秒級狀態反饋 (editMessageText)</strong></td>
         <td>已完成</td>
         <td><span class="badge badge-success">通過</span></td>
-        <td>自動解決 Markdown 原始碼洩漏與 HTML 實體解析崩潰問題。</td>
+        <td>0.5秒秒回「檢索中/思考中」，完成後原地更新為解答，不洗版。</td>
       </tr>
       <tr>
-        <td><strong>長篇回答續寫機制</strong></td>
+        <td><strong>全域錯誤透明回報 (Anti-Silent)</strong></td>
         <td>已完成</td>
         <td><span class="badge badge-success">通過</span></td>
-        <td>檢測長文輸出邊界，支援輸入「繼續」無縫串接下一段論述。</td>
+        <td>捕捉所有未預期例外，即時向用戶回報原因，拒絕石沉大海。</td>
       </tr>
       <tr>
-        <td><strong>429 搜尋額度智慧降級</strong></td>
+        <td><strong>GAS 類 Grounding 即時檢索</strong></td>
         <td>已完成</td>
         <td><span class="badge badge-success">通過</span></td>
-        <td>免費專案 Search 配額為 0 時，背景自動秒退回標準模式回答。</td>
+        <td>繞過 Google Search 429 配額限制，由 GAS 抓取新聞 RSS。</td>
       </tr>
       <tr>
-        <td><strong>真實時序時間認知注入</strong></td>
+        <td><strong>上下文代名詞消解 (Coreference)</strong></td>
         <td>已完成</td>
         <td><span class="badge badge-success">通過</span></td>
-        <td>動態注入當前台北時間（2026年），破除模型誤認 2025 年盲點。</td>
+        <td>追問「這位老師在 Dcard 評價」自動補全主詞「東華大學 陳文盛」。</td>
+      </tr>
+      <tr>
+        <td><strong>來源嚴格相關性校驗</strong></td>
+        <td>已完成</td>
+        <td><span class="badge badge-success">通過</span></td>
+        <td>逐篇檢驗是否包含核心實體，非相關新聞剔除，杜絕假來源。</td>
       </tr>
       <tr>
         <td><strong>LINE Messaging API 雙軌接軌</strong></td>
         <td>規劃中</td>
         <td><span class="badge badge-progress">第二版預定</span></td>
-        <td>第一版已驗證所有核心業務邏輯，第二版將新增 LINE 簽章驗證。</td>
+        <td>第一版已驗證所有核心大腦，第二版擴充 LINE 簽章驗證。</td>
       </tr>
     </tbody>
   </table>
 
-  <h1>四、實測結果與避坑經驗總結</h1>
+  <h1>四、實測成果與避坑分析 (測試結果)</h1>
   <p>
-    在開發與驗證過程中，我們如實記錄並克服了以下實測難題（相關截圖詳見開發紀錄網頁）：
+    在開發與驗證過程中，我們如實記錄並克服了以下實測難題（相關截圖詳見開發紀錄網頁第 5 章）：
   </p>
   <ul>
     <li>
-      <strong>克服 Telegram Webhook 訊息狂發風暴</strong>：GAS 呼叫外部 API 耗時約 3 秒，Telegram 伺服器因未即時獲得 200 回應而反覆重試。我們實作了 <span class="code">update_id</span> 短期快取去重機制，直接將重複請求於入口端濾除。
+      <strong>2026 年亞運會最新成績檢索實證</strong>：執行 <code>/search 2026 年台灣亞運會成績</code>，成功突破 2025 年知識庫截斷限制，即時抓取最新新聞並列出未來商務、遠見雜誌等真實來源。
     </li>
     <li>
-      <strong>排版渲染修復</strong>：Gemini 回覆長書單或條列內容時常帶有未支援的 Markdown 標籤，導致 Telegram API 報錯 <span class="code">can't parse entities</span>。實作自製解析器與自動閉合標籤後，排版品質達到高質感呈現。
+      <strong>東華大學陳文盛老師多輪實體消歧</strong>：
+      初次檢索時因東華大學同名同姓衝突，模型關聯至知名生科系榮譽教授；經過第 2、3 輪補充「通識中心、花蓮高中、資工系」後，AI 成功鎖定開授 Python 程式設計之兼任老師並準確回答排課。
     </li>
     <li>
-      <strong>破解 Google Search 429 配額陷阱與 2025 年時間認知</strong>：開啟 Search Grounding 時遭遇 Google 免費額度 429 拒絕，且模型因知識截斷將今年誤認作 2025 年。我們以「429 自動拔除工具重試」與「System Instruction 系統時鐘注入」雙管齊下，既不中斷對話，又能讓 AI 明確認知當前確切年份。
+      <strong>代詞追問與 Dcard 評價吻合</strong>：
+      第四次追問「這位老師在 Dcard 的評價是什麼？」，AI 成功調動深層校園語料庫，精確道出「上課溫柔、給分又甜又涼、對非科班友善」之真實學生心得。
+    </li>
+    <li>
+      <strong>克服來源張冠李戴問題 (v1.9.2)</strong>：
+      實測中發現舊版在代詞追問時因缺乏主詞而搜出「兒童線上英語」等無關新聞，促使我們在最新版實裝「代名詞自動補全」與「實體相關性過濾」，無關來源一律剔除！
     </li>
   </ul>
 
   <h1>五、第一版待改善問題與第二版展望</h1>
   <div class="card">
     <ol>
-      <li><strong>LINE Messaging API 實裝</strong>：第一版以 Telegram 建立起完整的配額防護與對話骨架，下一階段將在 <span class="code">Main.gs</span> 加入 LINE 專屬 Webhook 解析與 Push/Reply 訊息路由，達成跨平台雙開。</li>
-      <li><strong>Google Sheets 自訂知識庫（RAG 檢索增強）</strong>：規劃在試算表中新增 FAQ 知識頁面，讓 Bot 在發送給 Gemini 前優先比對特定領域問答，打造專屬校園或專題助教。</li>
-      <li><strong>付費版即時搜尋整合</strong>：評估綁定 Google Cloud Project 以解鎖官方 Grounding 搜尋額度，或串接無額度限制的公開新聞 API。</li>
+      <li><strong>LINE Messaging API 雙軌整合</strong>：第一版以 Telegram 建立起完整的配額防護、類 Grounding 檢索與對話骨架，下一階段將在 <span class="code">Main.gs</span> 加入 LINE 專屬 Webhook 解析 (<code>X-Line-Signature</code>) 與 Reply API，達成 LINE & Telegram 雙平台同時支援。</li>
+      <li><strong>校園/內部知識庫自訂檢索 (RAG)</strong>：目前 Google News RSS 適合大眾時事新聞，但對大學特定冷門開課或行政規章資料命中率有限。第二版將在 Google 試算表建立 FAQ 分頁，實現校園/企業專屬 RAG 知識庫。</li>
+      <li><strong>備用搜尋引擎介接</strong>：整合 DuckDuckGo Instant Answer 或維基百科 API 作為非新聞查詢之備用水庫。</li>
     </ol>
   </div>
 
