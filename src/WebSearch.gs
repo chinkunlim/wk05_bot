@@ -145,6 +145,7 @@ function fetchLatestWebInfo(query, maxResults = 4, history = null) {
     }
   }
 
+  return result;
 }
 
 /**
