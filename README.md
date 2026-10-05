@@ -167,8 +167,8 @@ wk05_bot/
 ├── index.html              # 根目錄開發紀錄網頁 (自動導向至 docs/)
 ├── appsscript.json         # Apps Script 資訊清單 (V8 引擎、台北時區)
 ├── 專題計畫書_AI智慧助理Bot第一版.pdf # 完整專題企劃規格書
-├── 專題簡報_AI智慧助理Bot第一版.pdf # 成果發表簡報
-├── LINEBot-AI智慧助理Bot第一版-成果簡報.pdf # 符合作業規定命名之成果簡報
+├── LINEBot-AI智慧助理Bot第一版-成果簡報.pdf # 第一版成果簡報
+├── TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf # 課後改善版成果簡報 (v1.9.5)
 ├── README.md               # 專案詳細安裝與操作手冊 (本文件)
 ├── DECISIONS.md            # 架構設計決策記錄 (ADR-001 ~ ADR-012)
 ├── CHANGELOG.md            # 版本變更記錄 (v1.0 ~ v1.9.2)
@@ -228,4 +228,4 @@ wk05_bot/
 - 🌐 **開發紀錄網頁 (GitHub Pages)**：[https://chinkunlim.github.io/wk05_bot/](https://chinkunlim.github.io/wk05_bot/)
 - 🔍 **實測證明章節錨點**：[開發紀錄網頁第 5 章 (#proof-of-testing)](https://chinkunlim.github.io/wk05_bot/#proof-of-testing)
 - 📄 **專題計畫書 PDF**：[專題計畫書_AI智慧助理Bot第一版.pdf](專題計畫書_AI智慧助理Bot第一版.pdf)
-- 📊 **專題成果簡報 PDF**：[專題簡報_AI智慧助理Bot第一版.pdf](專題簡報_AI智慧助理Bot第一版.pdf) / [LINEBot-AI智慧助理Bot第一版-成果簡報.pdf](LINEBot-AI智慧助理Bot第一版-成果簡報.pdf)
+- 📊 **專題成果簡報 PDF**：[TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf](TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf)（課後改善版）/ [LINEBot-AI智慧助理Bot第一版-成果簡報.pdf](LINEBot-AI智慧助理Bot第一版-成果簡報.pdf)（第一版）
