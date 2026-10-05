@@ -33,6 +33,24 @@ const CONFIG = {
 let _cachedEnv = null;
 
 /**
+ * 自動標準化使用者輸入之模型名稱，容錯處理空格、大小寫與前綴缺漏
+ * 例如："3.8 flash" ➔ "gemini-3.8-flash"
+ *       "3.5-flash" ➔ "gemini-3.5-flash"
+ *       "gemini-2.5-flash" ➔ "gemini-2.5-flash"
+ */
+function normalizeModelName(raw) {
+  if (!raw) return CONFIG.DEFAULT_GEMINI_MODEL;
+  let s = String(raw).trim().toLowerCase();
+  s = s.replace(/[\s_]+/g, '-');
+  if (/^[0-9]/.test(s)) {
+    s = 'gemini-' + s;
+  } else if (!s.startsWith('gemini-') && !s.startsWith('gemma-') && !s.startsWith('lyria-') && !s.startsWith('nano-') && !s.startsWith('antigravity-') && !s.startsWith('deep-research-')) {
+    s = 'gemini-' + s;
+  }
+  return s;
+}
+
+/**
  * 取得腳本屬性 (Script Properties) 中的環境變數
  * @returns {Object} 包含 telegramToken, geminiApiKey, geminiModel, allowedUserIds, maxDailyRequests, webhookUrl
  */
@@ -41,11 +59,12 @@ function getEnv() {
 
   const props = PropertiesService.getScriptProperties();
   const rawAllowedUsers = props.getProperty('ALLOWED_USER_IDS') || '';
+  const rawModel = props.getProperty('GEMINI_MODEL') || CONFIG.DEFAULT_GEMINI_MODEL;
   
   _cachedEnv = {
     telegramToken: props.getProperty('TELEGRAM_BOT_TOKEN') || '',
     geminiApiKey: props.getProperty('GEMINI_API_KEY') || '',
-    geminiModel: props.getProperty('GEMINI_MODEL') || CONFIG.DEFAULT_GEMINI_MODEL,
+    geminiModel: normalizeModelName(rawModel),
     allowedUserIds: rawAllowedUsers
       .split(',')
       .map(id => id.trim())

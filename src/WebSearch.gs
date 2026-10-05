@@ -79,27 +79,47 @@ function extractSearchKeyword(text) {
     if (query.length === 0) return '台灣 最新新聞';
   }
 
-  // 1. 將所有標點符號與換行替換為單一空格
-  query = query.replace(/[。，！？!?,\.\n/；;:：]+/g, ' ');
+  // 1. 將所有標點符號（包含頓號 、 句號 。 逗號 ， 問號 ？）與換行替換為單一空格
+  query = query.replace(/[。，！？!?,\.\n/；;:：、～~—_]+/g, ' ');
 
-  // 2. 移除常見提問贅詞、助詞與問句語尾
+  // 2. 移除常見提問贅詞、助詞、度量問句與語尾
   const stopPhrases = [
     '請問', '請告訴我', '我想知道', '你知道', '有沒有', '可以跟我說',
     '幫我查', '幫我搜尋', '查詢', '一下', '什麼是', '是誰',
     '有教哪些課', '開什麼課', '在哪些系', '評價是什麼', '評價如何',
-    '有哪些課', '推薦嗎', '好不好', '可以選嗎', '的老師', '也是'
+    '有哪些課', '推薦嗎', '好不好', '可以選嗎', '的老師', '也是',
+    '是多少', '多少個', '多少面', '數量', '結果', '今年', '今年的', '最近', '目前',
+    '和資訊科技有關的', '有關的', '相關的'
   ];
 
   stopPhrases.forEach(phrase => {
     query = query.replace(new RegExp(phrase, 'gi'), ' ');
   });
 
-  // 3. 整理詞彙與空白
-  const words = query.split(/\s+/).filter(w => w.length > 0);
-  if (words.length === 0) return '最新新聞';
+  // 3. 關鍵實體字詞強制分離（避免中文無空格時連成超長單句致搜尋失準）
+  const keyEntities = [
+    '台灣', '中華隊', '東華大學', '陳文盛', '通識課', '通識', '資工系', '花蓮高中', 'Dcard',
+    '杭州亞運', '名古屋亞運', '亞運會', '亞運', '奧運會', '奧運', '金牌', '銀牌', '銅牌', '獎牌',
+    '颱風', '天氣', '地震', '台積電', '美股'
+  ];
 
-  // 若切分後詞彙過多（超過 5 個），只取前 4 個核心詞以提升搜尋引擎命中率
-  return words.slice(0, 4).join(' ');
+  keyEntities.forEach(ent => {
+    if (query.includes(ent)) {
+      query = query.replace(new RegExp(ent, 'g'), ' ' + ent + ' ');
+    }
+  });
+
+  // 4. 清理無意義助詞並過濾
+  const particles = ['的', '了', '和', '與', '在', '之', '個', '嗎', '呢', '啊'];
+  let words = query.split(/\s+/)
+    .map(w => w.replace(/^[的了與和在之個]+|[的了與和在之個]+$/g, ''))
+    .filter(w => w.length > 0 && !particles.includes(w));
+    
+  if (words.length === 0) return '台灣 最新新聞';
+
+  // 5. 去重並取前 4 個最具代表性的核心詞
+  const uniqueWords = [...new Set(words)];
+  return uniqueWords.slice(0, 4).join(' ');
 }
 
 /**
