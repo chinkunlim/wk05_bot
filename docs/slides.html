@@ -2,11 +2,10 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>專題簡報 - Serverless AI 智慧對話助理 Bot (第一版)</title>
+  <title>成果簡報 - Serverless AI 智慧對話助理 Bot (改善版)</title>
   <style>
-    /* Native Apple system fonts for instant, zero-latency rendering */
     @page {
-      size: 297mm 167mm; /* 16:9 簡報標準比例 */
+      size: 297mm 167mm; /* 16:9 標準比例 */
       margin: 0;
     }
 
@@ -19,9 +18,10 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Heiti TC", "Noto Sans TC", sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "PingFang SC", "Heiti TC", "Noto Sans TC", sans-serif;
+      background: #090d16;
+      color: #f1f5f9;
+      -webkit-font-smoothing: antialiased;
     }
 
     .slide {
@@ -33,10 +33,10 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 18mm 22mm;
-      background: radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.18), transparent 45%),
-                  radial-gradient(circle at 10% 90%, rgba(168, 85, 247, 0.18), transparent 45%),
-                  #0f172a;
+      padding: 16mm 20mm;
+      background: radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.15), transparent 45%),
+                  radial-gradient(circle at 10% 90%, rgba(245, 158, 11, 0.12), transparent 45%),
+                  #0b1120;
     }
 
     /* Header */
@@ -44,35 +44,39 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5mm;
+      margin-bottom: 4mm;
     }
 
     .slide-tag {
-      font-size: 11pt;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10pt;
       font-weight: 700;
-      color: #818cf8;
+      color: #f59e0b;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
     }
 
     .slide-category {
-      font-size: 10pt;
+      font-size: 9.5pt;
       color: #94a3b8;
     }
 
     /* Title */
     .slide-title {
-      font-size: 22pt;
-      font-weight: 900;
+      font-size: 20pt;
+      font-weight: 800;
       color: #ffffff;
-      margin: 0 0 3mm 0;
-      line-height: 1.2;
+      margin: 0 0 2mm 0;
+      line-height: 1.25;
     }
 
     .slide-desc {
-      font-size: 11pt;
+      font-size: 10.5pt;
       color: #94a3b8;
-      margin: 0 0 6mm 0;
+      margin: 0 0 4mm 0;
+      line-height: 1.4;
     }
 
     /* Content Area */
@@ -88,35 +92,63 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 4mm;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      font-size: 8.5pt;
+      padding-top: 3.5mm;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 8pt;
       color: #64748b;
     }
 
-    /* Cards */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5mm; }
+    /* Grid & Cards */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4.5mm; }
     .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4mm; }
 
     .card {
-      background: rgba(30, 41, 59, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 5mm 6mm;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 4mm 5mm;
+    }
+
+    .card-accent-amber {
+      border-top: 3px solid #f59e0b;
+    }
+
+    .card-accent-indigo {
+      border-top: 3px solid #6366f1;
+    }
+
+    .card-accent-emerald {
+      border-top: 3px solid #10b981;
+    }
+
+    .card-accent-rose {
+      border-top: 3px solid #f43f5e;
     }
 
     .card-title {
-      font-size: 12pt;
+      font-size: 11pt;
       font-weight: 700;
-      color: #38bdf8;
+      color: #ffffff;
       margin-bottom: 2mm;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .card-text {
-      font-size: 9.5pt;
+      font-size: 9pt;
       color: #cbd5e1;
-      line-height: 1.5;
+      line-height: 1.45;
+    }
+
+    /* SVG icon utility */
+    .svg-icon {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      display: inline-block;
+      vertical-align: middle;
     }
 
     /* Cover specific */
@@ -126,372 +158,314 @@
     }
 
     .cover-pill {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       padding: 4px 14px;
       border-radius: 999px;
-      background: rgba(99, 102, 241, 0.2);
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      color: #a5b4fc;
-      font-size: 10.5pt;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      font-size: 9.5pt;
       font-weight: 700;
       margin-bottom: 5mm;
     }
 
     .cover-h1 {
-      font-size: 32pt;
+      font-size: 28pt;
       font-weight: 900;
-      line-height: 1.15;
-      margin-bottom: 4mm;
-      background: linear-gradient(135deg, #ffffff 40%, #c7d2fe 100%);
+      line-height: 1.2;
+      margin-bottom: 3.5mm;
+      background: linear-gradient(135deg, #ffffff 40%, #fed7aa 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .cover-sub {
-      font-size: 14pt;
+      font-size: 12.5pt;
       color: #94a3b8;
-      max-width: 220mm;
-      line-height: 1.4;
-      margin-bottom: 8mm;
+      max-width: 230mm;
+      line-height: 1.45;
+      margin-bottom: 7mm;
     }
 
     .cover-meta {
       display: flex;
-      gap: 10mm;
-      font-size: 10.5pt;
+      flex-wrap: wrap;
+      gap: 8mm;
+      font-size: 9.5pt;
       color: #cbd5e1;
+      padding-top: 4mm;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .badge-check {
-      color: #34d399;
-      margin-right: 4px;
-      font-weight: bold;
+    /* Table styling */
+    table.slide-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-top: 2mm;
+    }
+
+    table.slide-table th {
+      background: rgba(30, 41, 59, 0.9);
+      color: #e2e8f0;
+      text-align: left;
+      padding: 3mm 4mm;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    table.slide-table td {
+      padding: 3mm 4mm;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      line-height: 1.35;
     }
   </style>
 </head>
 <body>
 
-  <!-- Slide 1: Cover -->
+  <!-- Slide 1: Cover & Purpose -->
   <div class="slide">
     <div class="slide-header">
-      <div class="slide-tag">AI VIBE CODING 專題實作</div>
-      <div class="slide-category">期中專案 第一版成果匯報</div>
+      <div class="slide-tag">AI VIBE CODING 成果展示</div>
+      <div class="slide-category">課後作業 改善版成果匯報</div>
     </div>
     <div class="cover-body">
-      <div class="cover-pill">🚀 24/7 零成本 Serverless 架構 • 第一版發表</div>
-      <div class="cover-h1">Serverless AI 智慧對話助理 Bot<br>第一版專題成果簡報</div>
-      <div class="cover-sub">雙重額度防禦、類 Grounding 即時檢索、動態漸進回饋與全軌跡試算表稽核</div>
+      <div class="cover-pill">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        以第一版為起點完成深度進化 • Telegram 原生實作
+      </div>
+      <div class="cover-h1">Serverless AI 智慧對話助理 Bot<br>課後改善版 (v1.9.5) 成果簡報</div>
+      <div class="cover-sub">
+        解決 API 額度失控與檢索時效盲點，由第一版之基礎驗證，進一步完成「中文複合名詞 2-gram 柔性檢索」、「動態進度反饋」與「429 頻率退避重試」重大改善。
+      </div>
       <div class="cover-meta">
-        <div><strong>核心技術：</strong> Google Apps Script + Gemini 2.5 Flash</div>
-        <div><strong>第一版落地：</strong> Telegram Bot（免推播費/支援即時動態更新）</div>
-        <div><strong>目前版本：</strong> v1.9.2 (已開源)</div>
-        <div><strong>日期：</strong> 2026 年 10 月 05 日</div>
+        <div><strong>專題名稱：</strong> Serverless AI 智慧對話助理 Bot (改善版)</div>
+        <div><strong>使用對象：</strong> 需要即時時事查詢、課程評價、對話記憶之大眾與校園師生</div>
+        <div><strong>核心技術：</strong> Google Apps Script (Serverless) + Gemini Flash</div>
+        <div><strong>實作平台：</strong> Telegram Bot（免推播費/支援訊息原地動態編輯）</div>
+        <div><strong>版本狀態：</strong> v1.9.5 (開源於 GitHub，保留第一版 commit)</div>
       </div>
     </div>
     <div class="slide-footer">
       <div>專案 GitHub：https://github.com/chinkunlim/wk05_bot</div>
-      <div>1 / 8</div>
+      <div>第 1 頁 / 共 5 頁</div>
     </div>
   </div>
 
-  <!-- Slide 2: Platform Decision & Vision -->
+  <!-- Slide 2: Core Architecture & Features -->
   <div class="slide">
     <div class="slide-header">
-      <div class="slide-tag">專題緣起與平臺決策</div>
-      <div class="slide-category">Project Background & Platform Decision</div>
+      <div class="slide-tag">核心功能與對話架構</div>
+      <div class="slide-category">Serverless 24/7 零成本設計</div>
     </div>
-    <div>
-      <h2 class="slide-title">打破痛點與第一版平臺選型：為何優先 Telegram？</h2>
-      <p class="slide-desc">解決伺服器維護費、額度盜刷、回應黑箱痛點，並採取最利於即時互動的架構</p>
-    </div>
+    <div class="slide-title">四大核心功能模組與全流程運作機制</div>
+    <div class="slide-desc">整合 Google 雲端原生免費生態系，達成零常駐伺服器、高安全防護與即時新聞檢索之閉環。</div>
     <div class="slide-body">
-      <div class="grid-3">
-        <div class="card" style="border-top: 4px solid #ef4444;">
-          <div class="card-title" style="color: #f87171;">痛點 1：主機成本與推播限制</div>
+      <div class="grid-4">
+        <div class="card card-accent-amber">
+          <div class="card-title" style="color: #fbbf24;">1. 雙重額度安全防護</div>
           <div class="card-text">
-            傳統後端需租用常駐伺服器；LINE 免費帳號每月限制 200 則訊息，且<strong>不支援動態修改已發送訊息</strong>。<br><br>
-            <strong style="color: #34d399;">👉 第一版 Telegram 優先：</strong><br>
-            • GAS 24/7 免費代管，零主機費。<br>
-            • Telegram 支援 <code>editMessageText</code> 原生動態文字替換，回饋零延遲。
+            • 嚴格白名單 (ALLOWED_USER_IDS) 阻擋未授權存取。<br>
+            • 當日計數器 (MAX_DAILY_REQUESTS) 防止 API 費用超支。<br>
+            • 429 頻率超限自動冷卻 2.5 秒重試，保障服務不中斷。
           </div>
         </div>
-
-        <div class="card" style="border-top: 4px solid #f59e0b;">
-          <div class="card-title" style="color: #fbbf24;">痛點 2：LLM 額度盜刷風險</div>
+        <div class="card card-accent-indigo">
+          <div class="card-title" style="color: #818cf8;">2. 雲端原生類 Grounding</div>
           <div class="card-text">
-            公開 Webhook 暴露在外，任一路人發訊皆會抽乾 Gemini API 免費額度。<br><br>
-            <strong style="color: #34d399;">👉 雙重安全護盾防禦：</strong><br>
-            • <code>ALLOWED_USER_IDS</code> 白名單嚴格攔截。<br>
-            • <code>QuotaManager</code> 跨日自動歸零配額計數器，雙層保護用量。
+            • GAS 直接抓取 Google News RSS 即時新聞。<br>
+            • 支援代名詞上下文消歧補全 (Coreference Resolution)。<br>
+            • 突破 LLM 靜態訓練資料截止時間限制，並附可點擊來源。
           </div>
         </div>
-
-        <div class="card" style="border-top: 4px solid #3b82f6;">
-          <div class="card-title" style="color: #60a5fa;">痛點 3：免費版無法聯網與黑箱等待</div>
+        <div class="card card-accent-emerald">
+          <div class="card-title" style="color: #34d399;">3. 秒級原地狀態反饋</div>
           <div class="card-text">
-            Gemini 免費版內建 Google Search 配額為 0 (HTTP 429)；使用者發訊後無狀態提示，誤認當機。<br><br>
-            <strong style="color: #34d399;">👉 自研類 Grounding & 狀態回饋：</strong><br>
-            • GAS 自行抓取新聞 RSS 即時注入背景。<br>
-            • Telegram 即時回傳「檢索中/思考中」提示。
+            • 收到問題 0.5 秒內發送動態狀態提示。<br>
+            • editMessageText 原地即時變更：檢索中 &rarr; 思考中 &rarr; 最終解答。<br>
+            • 動態顯示取得篇數，乾淨不洗版，消滅盲等痛點。
           </div>
+        </div>
+        <div class="card card-accent-rose">
+          <div class="card-title" style="color: #fb7185;">4. 全對話軌跡日誌</div>
+          <div class="card-text">
+            • Google 試算表自動寫入時間、提問者、問題與解答。<br>
+            • 精確統計 Prompt / Completion / Total Tokens。<br>
+            • 內建 CacheService 短期記憶（保留 4 輪對話）。
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 4mm; background: rgba(30, 41, 59, 0.5);">
+        <div class="card-text" style="color: #94a3b8; font-size: 8.5pt;">
+          <strong style="color: #e2e8f0;">對話範例流：</strong> 使用者輸入「/search 台灣最新新聞」 &rarr; 機器人 0.5 秒內秒回「收到提問，正在為您檢索即時資料中...」 &rarr; 原地更新為「即時資料檢索完成（成功獲取 4 篇最新相關資訊），正在分析彙整回答...」 &rarr; 原地轉化為條列式重點新聞、摘要與 4 則超連結來源！
         </div>
       </div>
     </div>
     <div class="slide-footer">
-      <div>第一版優先落地 Telegram，第二版規劃雙軌支援 LINE Messaging API</div>
-      <div>2 / 8</div>
+      <div>架構：GAS Webhook &rarr; QuotaManager &rarr; WebSearch &rarr; Gemini API &rarr; Telegram API</div>
+      <div>第 2 頁 / 共 5 頁</div>
     </div>
   </div>
 
-  <!-- Slide 3: System Architecture -->
+  <!-- Slide 3: Improvement Results & 3 Test Cases -->
   <div class="slide">
     <div class="slide-header">
-      <div class="slide-tag">系統架構與技術棧</div>
-      <div class="slide-category">System Architecture</div>
+      <div class="slide-tag">改善成果與實測驗證</div>
+      <div class="slide-category">作業關鍵四大要素落實</div>
     </div>
-    <div>
-      <h2 class="slide-title">高可用無伺服器 (Serverless) 資料流</h2>
-      <p class="slide-desc">在 Google Cloud 全球骨幹網路上完成身分認證、即時檢索、狀態回饋與 LLM 推理</p>
-    </div>
-    <div class="slide-body">
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title">端到端資料流水線 (End-to-End Pipeline)</div>
-          <div class="card-text" style="font-size: 9pt; line-height: 1.6;">
-            1. <strong>Webhook 入口防重擊</strong>：快取 <code>update_id</code>，阻絕 Telegram 逾時重發風暴。<br>
-            2. <strong>身分與配額攔截</strong>：比對白名單與當日計數，未授權用戶立即阻擋。<br>
-            3. <strong>發送動態佔位訊息</strong>：立即發送 <code>⏳ 收到您的問題...</code> 並取得 <code>message_id</code>。<br>
-            4. <strong>Serverless 類 Grounding</strong>：呼叫 <code>WebSearch.gs</code> 抓取 Google News RSS，並更新狀態為 <code>🔍 正在檢索...</code>。<br>
-            5. <strong>消歧義與上下文組裝</strong>：解析指代名詞，拼接短期對話記憶 (<span style="color:#a5b4fc;">CacheService</span>)。<br>
-            6. <strong>Gemini 2.5 推論與就地替換</strong>：推論完成後透過 <code>editTelegramMessage</code> 將佔位訊息平滑更新為完整答案與來源。<br>
-            7. <strong>試算表記錄</strong>：寫入 Google Sheets 完整留存時間戳、Prompt 與 Token 消耗。
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">核心模組職責矩陣 (Module Matrix)</div>
-          <div class="card-text" style="font-size: 9pt; line-height: 1.6;">
-            • <strong style="color:#ffffff;">Main.gs</strong>：Webhook 路由、漸進式狀態更新流水線、透明錯誤回報。<br>
-            • <strong style="color:#ffffff;">WebSearch.gs</strong>：Serverless 即時搜尋引擎、代名詞消歧義、無關來源過濾。<br>
-            • <strong style="color:#ffffff;">Telegram.gs</strong>：長文分段、HTML 自動閉合修復、<code>editTelegramMessage</code> 原生支援。<br>
-            • <strong style="color:#ffffff;">Gemini.gs</strong>：REST 通訊、8192 Token、429 無感降級、時序注入、檢索上下文注入。<br>
-            • <strong style="color:#ffffff;">QuotaManager.gs</strong>：白名單過濾、每日限額跨日重置。<br>
-            • <strong style="color:#ffffff;">Storage.gs</strong>：多輪對話快取序列化、Google Sheets 稽核日誌記錄。
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="slide-footer">
-      <div>AI 對話助理 Bot (第一版) • 架構設計</div>
-      <div>3 / 8</div>
-    </div>
-  </div>
-
-  <!-- Slide 4: Feature 1 - Progressive Status Feedback -->
-  <div class="slide">
-    <div class="slide-header">
-      <div class="slide-tag">核心突破 (一)</div>
-      <div class="slide-category">Progressive UX & Error Transparency</div>
-    </div>
-    <div>
-      <h2 class="slide-title">即時動態狀態回饋與透明除錯機制</h2>
-      <p class="slide-desc">徹底告別黑箱等待；使用者發訊後立即可知 Bot 當前運作進度</p>
-    </div>
+    <div class="slide-title">課後改善版 (v1.9.5) 關鍵突破與三項情境測試</div>
+    <div class="slide-desc">記錄「原本問題 &rarr; 修改內容 &rarr; 前後差異 &rarr; 重新測試結果」，並完整親測三種情境。</div>
     <div class="slide-body">
       <div class="grid-2">
-        <div class="card" style="border-left: 4px solid #38bdf8;">
-          <div class="card-title" style="color: #38bdf8;">1. Telegram 原生動態狀態看板</div>
-          <div class="card-text">
-            <strong>使用者痛點：</strong> 傳統 Bot 發送後無任何反應，使用者不清楚是否成功送出，產生焦慮甚至重複按送出。<br><br>
-            <strong>解決方案 (v1.8.0 / v1.9.0)：</strong><br>
-            • <strong>階段一 (即時接收)：</strong> 發送 <code>⏳ 收到您的問題，正在為您處理中...</code><br>
-            • <strong>階段二 (即時檢索)：</strong> 替換為 <code>🔍 正在檢索即時新聞與公開資料...</code><br>
-            • <strong>階段三 (深度分析)：</strong> 替換為 <code>🧠 正在深度分析並為您整理完整回答...</code><br>
-            • <strong>階段四 (完美呈現)：</strong> 原地平滑更新為完整答案，對話框乾淨不灌水！
+        <!-- 4 Items Summary -->
+        <div class="card card-accent-amber">
+          <div class="card-title" style="color: #fbbf24;">四大改善要素記錄</div>
+          <div class="card-text" style="font-size: 8.5pt;">
+            • <strong>原本問題：</strong> 提問複合詞「台灣亞運會」時，爬蟲抓到 8 篇新聞卻因過濾器硬匹配完整 5 字而全數被誤判為無效噪音丟棄 (0 篇)，AI 只能無奈回覆「無法連網檢索」。<br>
+            • <strong>修改內容：</strong> 重構 WebSearch.gs，導入地域前綴剝除與 2-gram 核心詞素萃取；Main.gs 新增動態篇數反饋；Gemini.gs 實作 429 退避與 404/503 自動備援。<br>
+            • <strong>前後差異：</strong> 複合詞命中率由 0% 飆升至 100% (8 篇全數通過)；AI 精確回覆「55 面獎牌 (5金17銀33銅)」並附來源；徹底杜絕 429 頻率限速報錯。<br>
+            • <strong>重測結果：</strong> 如下表三項情境，各項預期與實際表現均 100% 通過驗證！
           </div>
         </div>
 
-        <div class="card" style="border-left: 4px solid #f43f5e;">
-          <div class="card-title" style="color: #fb7185;">2. 全局透明錯誤報警機制</div>
-          <div class="card-text">
-            <strong>使用者痛點：</strong> 腳本出錯時後台靜默失敗或只印日誌，前端毫無反饋。<br><br>
-            <strong>解決方案 (v1.9.1)：</strong><br>
-            • 在 <code>Main.gs</code> 頂層 <code>try...catch</code> 中加入真實錯誤字串傳遞。<br>
-            • 若發生未定義變數或 API 異常，Telegram 直接顯示具體錯誤訊息（如 <code>ReferenceError: env is not defined</code>）。<br>
-            • <strong>效益：</strong> 開發者可立即截圖除錯，數分鐘內精準修復變數作用域問題。
-          </div>
+        <!-- 3 Test Cases Table -->
+        <div class="card card-accent-emerald">
+          <div class="card-title" style="color: #34d399;">三項測試情境親測紀錄表</div>
+          <table class="slide-table">
+            <thead>
+              <tr>
+                <th>測試情境</th>
+                <th>輸入內容</th>
+                <th>預期結果</th>
+                <th>實際測試結果</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="color: #34d399; font-weight: bold;">情境 1：正常使用</td>
+                <td>/search 台灣亞運會今年的金、銀、銅牌的數量是多少？</td>
+                <td>取得即時新聞，計算獎牌總數與提供來源</td>
+                <td style="color: #34d399;">成功取得 4 篇新聞，精準回答 55 面獎牌 (5金17銀33銅)，附完整超連結（通過 <svg style="width:12px;height:12px;fill:#34d399;display:inline-block;vertical-align:middle;" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>）</td>
+              </tr>
+              <tr>
+                <td style="color: #fbbf24; font-weight: bold;">情境 2：輸入不完整</td>
+                <td>/search（無參數）</td>
+                <td>不拋錯崩潰，提醒補充關鍵字</td>
+                <td style="color: #fbbf24;">提示帶入關鍵字並給予範例，同時自動降級檢索台灣即時頭條（通過 <svg style="width:12px;height:12px;fill:#fbbf24;display:inline-block;vertical-align:middle;" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>）</td>
+              </tr>
+              <tr>
+                <td style="color: #818cf8; font-weight: bold;">情境 3：不支援輸入</td>
+                <td>/unknown_command</td>
+                <td>提供清楚使用引導</td>
+                <td style="color: #818cf8;">提示不支援該指令，引導 /help 查看可用指令，並作為一般提問正常解答（通過 <svg style="width:12px;height:12px;fill:#818cf8;display:inline-block;vertical-align:middle;" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>）</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
     <div class="slide-footer">
-      <div>AI 對話助理 Bot (第一版) • 使用者體驗升級</div>
-      <div>4 / 8</div>
+      <div>實測證明詳見開發紀錄網頁第 6 章與第 5 章截圖展示</div>
+      <div>第 3 頁 / 共 5 頁</div>
     </div>
   </div>
 
-  <!-- Slide 5: Feature 2 - Serverless Grounding & Context Expansion -->
+  <!-- Slide 4: AI Collaboration & Review Experience -->
   <div class="slide">
     <div class="slide-header">
-      <div class="slide-tag">核心突破 (二)</div>
-      <div class="slide-category">Serverless Web Search & Context Injection</div>
+      <div class="slide-tag">AI 協作與審查經驗</div>
+      <div class="slide-category">深度反思與人機協同</div>
     </div>
-    <div>
-      <h2 class="slide-title">突破免費限制：GAS 類 Grounding 檢索與消歧義</h2>
-      <p class="slide-desc">維持 100% 免費架構，達成即時時事獲取、多輪指代代名詞消歧義與精準資料源過濾</p>
-    </div>
+    <div class="slide-title">AI 如何協助開發，以及我們如何審查與修正 AI 產出</div>
+    <div class="slide-desc">真實記錄開發過程中的人機互動、代表性提示詞，以及發現並修復 AI 盲點的寶貴經驗。</div>
     <div class="slide-body">
       <div class="grid-3">
-        <div class="card">
-          <div class="card-title" style="color: #34d399;">1. Serverless 類 Grounding</div>
+        <div class="card card-accent-indigo">
+          <div class="card-title" style="color: #818cf8;">1. 使用的 AI 工具</div>
           <div class="card-text">
-            • Google AI Studio 免費帳號之 Search 配額為 0。<br>
-            • 改由 GAS 內 <code>UrlFetchApp</code> 針對 Google News RSS 抓取即時新聞 XML。<br>
-            • 過濾標籤保留核心摘要，將精簡資料拼裝為 Prompt 背景注入 Gemini。
+            • <strong>開發環境：</strong> Google Antigravity Agentic IDE。<br>
+            • <strong>基礎模型：</strong> Google Gemini 2.5 / 3.5 / 3.6 Flash 系列。<br>
+            • <strong>執行環境：</strong> Google Apps Script (V8 Runtime) + Node.js 本機語法沙盒檢驗。
           </div>
         </div>
-
-        <div class="card">
-          <div class="card-title" style="color: #a78bfa;">2. 指代代名詞消歧義擴展</div>
+        <div class="card card-accent-amber">
+          <div class="card-title" style="color: #fbbf24;">2. 代表性提示詞指令</div>
           <div class="card-text">
-            • <strong>痛點：</strong> 用戶追問「這位老師在 Dcard 評價？」，搜尋字詞缺少主詞導致檢索失準。<br>
-            • <strong>解決方案 (v1.9.2)：</strong> 內建 <code>expandQueryWithContext()</code>，自動從對話快取提取主體名詞，重構檢索詞為「東華大學 陳文盛 Dcard 評價」。
+            • <strong>通用性要求：</strong>「會隨機提問，所以不要根據我的問題 hardcoded。」（確保開放式領域穩健性）<br>
+            • <strong>敏銳除錯質疑：</strong>「第一張截圖是用 3.6，第二張是用 3.5，都顯示沒有 search 功能。我們之前使用爬蟲去找丟給 gemini，現在還是嗎？」（直接命中問題根源）
           </div>
         </div>
-
-        <div class="card">
-          <div class="card-title" style="color: #fbbf24;">3. 相關性來源過濾機制</div>
+        <div class="card card-accent-rose">
+          <div class="card-title" style="color: #fb7185;">3. 檢查或修正 AI 產出經驗</div>
           <div class="card-text">
-            • <strong>痛點：</strong> 搜尋結果有時包含不相關新聞（如銘傳大學、兒童英語），盲目引用造成誤導。<br>
-            • <strong>解決方案 (v1.9.2)：</strong> <code>filterRelevantArticles()</code> 嚴格驗證實體關鍵字，未命中者全數剔除；若無相關結果則隱藏來源區塊。
+            • <strong>抓出過濾器誤殺盲點：</strong> 當使用者提出上述質疑時，AI 原先以為是模型切換問題。經使用者提醒並深入執行單元測試後，發現 AI 先前編寫的相關性過濾器存在「僵化完整字串匹配」缺陷，導致 8 篇有效新聞被 100% 誤殺為 0 篇！<br>
+            • <strong>成功引導重構：</strong> 由開發者引導 AI 放寬召回率，改採 2-gram 雙字詞素抽取與前綴剝除，一舉將命中率修復回 100%。
           </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 4mm; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(245, 158, 11, 0.4);">
+        <div class="card-text" style="color: #fde68a; font-size: 8.5pt;">
+          <strong>人機協同體會：</strong> AI 在代碼生成上速度極快，但在多語系斷詞與邊界條件（如中文專有名詞縮寫慣例）上容易陷入「過度嚴格過濾」的盲點。人類開發者保持敏銳的邏輯質疑、以真實場景截圖反饋，並進行代碼級追蹤，是打造高可靠性 AI 系統不可或缺的關鍵。
         </div>
       </div>
     </div>
     <div class="slide-footer">
-      <div>AI 對話助理 Bot (第一版) • 檢索技術演進</div>
-      <div>5 / 8</div>
+      <div>AI 協作亮點：保留所有 Git 歷程，真實記錄人機互動與問題修復歷程</div>
+      <div>第 4 頁 / 共 5 頁</div>
     </div>
   </div>
 
-  <!-- Slide 6: Case Study & Empirical Findings -->
+  <!-- Slide 5: Insights, Limitations & Submission Info -->
   <div class="slide">
     <div class="slide-header">
-      <div class="slide-tag">關鍵實測個案剖析</div>
-      <div class="slide-category">Case Study & Multi-turn Convergence</div>
+      <div class="slide-tag">心得限制與繳交資訊</div>
+      <div class="slide-category">成果總結與未來藍圖</div>
     </div>
-    <div>
-      <h2 class="slide-title">真實提問案例剖析：為什麼越問越精準？</h2>
-      <p class="slide-desc">以「杭州亞運金牌檢索」與「東華大學陳文盛老師」為例，揭示 LLM 多輪知識收斂機制</p>
-    </div>
+    <div class="slide-title">專題心得、已知限制與 e學苑繳交資訊一覽</div>
+    <div class="slide-desc">全面檢討技術收穫與待改善方向，並提供作業線上文字一鍵繳交資訊。</div>
     <div class="slide-body">
       <div class="grid-2">
-        <div class="card">
-          <div class="card-title">個案一：時事檢索 (杭州亞運金牌數)</div>
-          <div class="card-text" style="font-size: 9.5pt; line-height: 1.55;">
-            • <strong>提問：</strong>「台灣在杭州亞運獲得多少面金牌？」<br>
-            • <strong>執行歷程：</strong> Bot 即時觸發 <code>WebSearch.gs</code> 檢索亞運相關報導。<br>
-            • <strong>實測結果：</strong> 成功精確回覆「19面金牌、20面銀牌、28面銅牌，總計67面獎牌，追平隊史最佳紀錄」，並附上相關時事參考來源。<br>
-            • <strong>意義：</strong> 驗證 GAS 類 Grounding 具備突破 LLM 知識截斷之即時資訊獲取能力。
+        <!-- Left: Reflection & Next Step -->
+        <div class="card card-accent-emerald">
+          <div class="card-title" style="color: #34d399;">專題心得與下一步規劃</div>
+          <div class="card-text" style="font-size: 8.5pt;">
+            • <strong>核心學習收穫：</strong> 深刻體會到 Serverless 雲端原生架構的強大，完全不花一分錢（0 元主機費、0 元推播費）就能打造出具備對話記憶、即時聯網檢索與自動容錯的商用級 Bot。<br>
+            • <strong>已知限制與待改善：</strong><br>
+              1. <em>LINE 雙軌介接：</em> 目前第一版以 Telegram 平台完整驗證，第二版將新增 LINE Webhook 簽章與 Reply API。<br>
+              2. <em>專屬知識庫 (RAG)：</em> 目前依賴公開新聞 RSS，第二版可整合 Google 試算表自訂常見問答 (FAQ)。<br>
+              3. <em>非新聞知識源：</em> 針對百科或純名詞定義，未來可擴充維基百科或 DuckDuckGo API。
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">個案二：同名實體消歧義 (東華大學陳文盛老師)</div>
-          <div class="card-text" style="font-size: 9.5pt; line-height: 1.55;">
-            • <strong>問題根源：</strong> 東華大學有兩位「陳文盛」：(1) 生命科學系退休榮譽教授 (著作豐富)；(2) 通識教育中心兼任講師 (花蓮高中資訊教師，教授 Python)。<br>
-            • <strong>輪次一 (偏差)：</strong> 單靠模型預訓練記憶，直覺回答生科系教授。<br>
-            • <strong>輪次二 (無解)：</strong> 輸入純敘述句且帶標點符號，RSS 檢索無結果。<br>
-            • <strong>輪次三 & 四 (收斂)：</strong> 使用者補充「通識、資工、花中」，Bot 多輪記憶疊加消歧義，<strong>精準鎖定授課 Python 的陳老師</strong>！
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="slide-footer">
-      <div>AI 對話助理 Bot (第一版) • 個案實測分析</div>
-      <div>6 / 8</div>
-    </div>
-  </div>
-
-  <!-- Slide 7: Proof of Testing -->
-  <div class="slide">
-    <div class="slide-header">
-      <div class="slide-tag">實測證明與成果展示</div>
-      <div class="slide-category">Live Proof & Verification</div>
-    </div>
-    <div>
-      <h2 class="slide-title">第一版真實環境運行截圖實證</h2>
-      <p class="slide-desc">完整展示狀態動態回饋、即時時事檢索、多輪消歧義收斂與錯誤透明通報</p>
-    </div>
-    <div class="slide-body">
-      <div class="grid-4" style="text-align: center;">
-        <div class="card" style="padding: 3.5mm;">
-          <div style="font-size: 9.5pt; font-weight: bold; color: #38bdf8; margin-bottom: 2mm;">杭州亞運金牌檢索</div>
-          <img src="assets/proof_10_asian_games_gold.png" style="width: 100%; border-radius: 6px; border: 1px solid #334155;">
-          <div style="font-size: 8pt; color: #94a3b8; margin-top: 2mm;">19金即時時事精準回答</div>
-        </div>
-        <div class="card" style="padding: 3.5mm;">
-          <div style="font-size: 9.5pt; font-weight: bold; color: #38bdf8; margin-bottom: 2mm;">通識陳老師消歧義</div>
-          <img src="assets/proof_12_chen_disambiguation.png" style="width: 100%; border-radius: 6px; border: 1px solid #334155;">
-          <div style="font-size: 8pt; color: #94a3b8; margin-top: 2mm;">上下文疊加精確定位講師</div>
-        </div>
-        <div class="card" style="padding: 3.5mm;">
-          <div style="font-size: 9.5pt; font-weight: bold; color: #38bdf8; margin-bottom: 2mm;">Python 課程與進度</div>
-          <img src="assets/proof_13_chen_teaching_plan.png" style="width: 100%; border-radius: 6px; border: 1px solid #334155;">
-          <div style="font-size: 8pt; color: #94a3b8; margin-top: 2mm;">深度回答花中兼任與課綱</div>
-        </div>
-        <div class="card" style="padding: 3.5mm;">
-          <div style="font-size: 9.5pt; font-weight: bold; color: #38bdf8; margin-bottom: 2mm;">透明錯誤回報機制</div>
-          <img src="assets/proof_09_error_transparency_env.png" style="width: 100%; border-radius: 6px; border: 1px solid #334155;">
-          <div style="font-size: 8pt; color: #94a3b8; margin-top: 2mm;">透明通報精準定位問題</div>
-        </div>
-      </div>
-    </div>
-    <div class="slide-footer">
-      <div>全部實測證明詳見開發紀錄網頁第 5 章 (#proof-of-testing)</div>
-      <div>7 / 8</div>
-    </div>
-  </div>
-
-  <!-- Slide 8: Current Limitations & Phase 2 Roadmap -->
-  <div class="slide">
-    <div class="slide-header">
-      <div class="slide-tag">第一版待改善問題與展望</div>
-      <div class="slide-category">Current Status & Phase 2 Roadmap</div>
-    </div>
-    <div>
-      <h2 class="slide-title">第一版現況檢視與第二版 (Phase 2) 擴充藍圖</h2>
-      <p class="slide-desc">誠實反映現階段架構限制，確立後續功能演進方向</p>
-    </div>
-    <div class="slide-body">
-      <div class="grid-3">
-        <div class="card" style="border-top: 4px solid #f59e0b;">
-          <div class="card-title" style="color: #fbbf24;">1. LINE Messaging API 雙軌接軌</div>
-          <div class="card-text">
-            <strong>現狀：</strong> 第一版因訊息費用與動態看板考量，優先完成 Telegram Bot 部署。<br><br>
-            <strong>第二版規劃：</strong> 新增 LINE Webhook 簽章驗證與 Reply API，共用 Gemini、快取與試算表核心模組，達成雙平臺服務覆蓋。
-          </div>
-        </div>
-
-        <div class="card" style="border-top: 4px solid #10b981;">
-          <div class="card-title" style="color: #34d399;">2. 試算表自訂知識庫 (RAG)</div>
-          <div class="card-text">
-            <strong>現狀：</strong> Google Sheets 目前主要作為全軌跡日誌與 Token 消耗稽核庫。<br><br>
-            <strong>第二版規劃：</strong> 新增「FAQ 知識庫」分頁，透過語意相似度或關鍵字在提問前優先檢索專屬試算表，打造校園/企業專屬助理。
-          </div>
-        </div>
-
-        <div class="card" style="border-top: 4px solid #6366f1;">
-          <div class="card-title" style="color: #a5b4fc;">3. 多元即時搜尋引擎串接</div>
-          <div class="card-text">
-            <strong>現狀：</strong> 採用 Google News RSS 類 Grounding，在即時時事表現優異，但小眾論壇 (如 Dcard) 涵蓋較受限。<br><br>
-            <strong>第二版規劃：</strong> 串接 Tavily、Serper 或 Google Custom Search API，進一步強化校園與特定論壇資料檢索廣度。
+        <!-- Right: Official Submission Info -->
+        <div class="card card-accent-amber" style="background: rgba(15, 23, 42, 0.9);">
+          <div class="card-title" style="color: #fbbf24;">e學苑作業線上文字繳交資訊</div>
+          <div class="card-text" style="font-size: 9pt; space-y: 2mm;">
+            <div style="margin-bottom: 2mm;">
+              <span style="color: #94a3b8;">專題名稱：</span><br>
+              <strong style="color: #ffffff; font-size: 10pt;">Serverless AI 智慧對話助理 Bot (改善版)</strong>
+            </div>
+            <div style="margin-bottom: 2mm;">
+              <span style="color: #94a3b8;">GitHub 專案連結：</span><br>
+              <a href="https://github.com/chinkunlim/wk05_bot" style="color: #818cf8; text-decoration: underline;">https://github.com/chinkunlim/wk05_bot</a>
+            </div>
+            <div style="margin-bottom: 2mm;">
+              <span style="color: #94a3b8;">開發紀錄網頁連結：</span><br>
+              <a href="https://chinkunlim.github.io/wk05_bot/" style="color: #818cf8; text-decoration: underline;">https://chinkunlim.github.io/wk05_bot/</a>
+            </div>
+            <div>
+              <span style="color: #94a3b8;">實測證明位置：</span><br>
+              <strong style="color: #fbbf24;">開發紀錄網頁第 6 章「課後改善版 (v1.9.5) 核心突破與重新測試專區」與第 5 章實測證明專區</strong>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <div class="slide-footer">
-      <div>第一版專案已完整開源於 GitHub • 開發紀錄網頁全面同步上線</div>
-      <div>8 / 8</div>
+      <div>已完成自我檢查：所有連結均有效、無敏感金鑰洩漏、符合作業各項要求</div>
+      <div>第 5 頁 / 共 5 頁</div>
     </div>
   </div>
 

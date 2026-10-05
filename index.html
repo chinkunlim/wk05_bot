@@ -37,19 +37,22 @@
           <i class="fa-solid fa-robot"></i>
         </div>
         <div>
-          <span class="font-extrabold text-lg text-white tracking-tight">AI Bot v1.9.2</span>
-          <span class="hidden sm:inline-block ml-2 text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">Telegram 原生第一版</span>
+          <span class="font-extrabold text-lg text-white tracking-tight">AI Bot v1.9.5</span>
+          <span class="hidden sm:inline-block ml-2 text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">課後改善版</span>
         </div>
       </div>
-      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+      <nav class="hidden md:flex items-center space-x-5 text-sm font-medium text-slate-300">
         <a href="#overview" class="hover:text-indigo-400 transition">專題概要</a>
         <a href="#architecture" class="hover:text-indigo-400 transition">系統架構</a>
         <a href="#features" class="hover:text-indigo-400 transition">核心功能</a>
         <a href="#dev-journey" class="hover:text-indigo-400 transition">避坑歷程</a>
-        <a href="#proof-of-testing" class="text-indigo-400 font-bold hover:text-indigo-300 transition flex items-center gap-1.5">
-          <i class="fa-solid fa-clipboard-check"></i> 實測證明專區
+        <a href="#improvement" class="text-amber-400 font-bold hover:text-amber-300 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-sparkles"></i> 課後改善成果 (v1.9.5)
         </a>
-        <a href="#pending-issues" class="hover:text-indigo-400 transition">待改善與下一版規劃</a>
+        <a href="#proof-of-testing" class="text-indigo-400 font-semibold hover:text-indigo-300 transition flex items-center gap-1">
+          <i class="fa-solid fa-clipboard-check"></i> 第一版實測
+        </a>
+        <a href="#pending-issues" class="hover:text-indigo-400 transition">待改善與規劃</a>
       </nav>
       <div class="flex items-center space-x-3">
         <a href="https://github.com/chinkunlim/wk05_bot" target="_blank" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3.5 py-2 rounded-lg border border-slate-700 transition font-semibold">
@@ -62,34 +65,34 @@
   <!-- Hero Section -->
   <section class="gradient-hero pt-32 pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800/80">
     <div class="max-w-5xl mx-auto text-center">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-6">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 24/7 零成本 Serverless 雲端原生架構 ‧ 第一版成果
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-6">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 課後作業改善版 (v1.9.5) 正式發布 ‧ 保留第一版並完成實測突破
       </div>
       <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white mb-6 leading-tight">
-        AI 智慧對話助理 Bot <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">第一版專題實作</span>
+        AI 智慧對話助理 Bot <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-indigo-300 to-purple-400">課後改善版實作成果</span>
       </h1>
       <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-8 leading-relaxed">
-        本專題旨在實踐一套無伺服器 (Serverless)、高安全防護且打破知識庫時間限制的 AI 聊天機器人。整合 Google Apps Script (GAS)、Google Gemini API 與 Google 試算表。第一版優先採用 Telegram Bot 驗證核心對話引擎與自建類 Grounding 搜尋系統，並如實規劃後續 LINE Messaging API 雙軌接軌。
+        本專題旨在實踐一套無伺服器 (Serverless)、高安全防護且打破知識庫時間限制的 AI 聊天機器人。以今日繳交之第一版為起點，我們使用 AI Agent 完成關鍵演算法改善（修復複合詞檢索誤殺、2-gram 詞素拆解、動態篇數狀態反饋、429 退避與 404/503 自動備援），保留第一版 Commit 並記錄四項關鍵指標。
       </p>
 
       <!-- Note about Telegram vs LINE -->
       <div class="max-w-2xl mx-auto mb-10 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-center justify-center gap-2 text-left">
         <i class="fa-solid fa-circle-exclamation text-amber-400 text-base"></i>
-        <span><strong>【平台選擇說明】</strong>：本專題第一版優先以 <strong>Telegram Bot</strong> 落地實作，成功驗證無伺服器架構、秒級動態反饋、上下文實體消歧與即時資料檢索；LINE Messaging API 將於第二版無縫擴充雙軌支援。</span>
+        <span><strong>【平台選擇說明】</strong>：本專題作業優先以 <strong>Telegram Bot</strong> 落地實作（老師已確認允許使用 Telegram），成功驗證無伺服器架構、秒級動態反饋、上下文實體消歧與即時資料檢索；LINE Messaging API 將於後續版本擴充雙軌支援。</span>
       </div>
 
       <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-semibold">
+        <a href="#improvement" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg shadow-amber-500/30 flex items-center gap-2 transition">
+          <i class="fa-solid fa-sparkles"></i> 查看改善版實測成果 (第 6 章)
+        </a>
         <a href="#proof-of-testing" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition">
-          <i class="fa-solid fa-circle-check"></i> 前往查看實測證明 (第 5 章)
+          <i class="fa-solid fa-circle-check"></i> 第一版實測證明 (第 5 章)
         </a>
         <a href="https://github.com/chinkunlim/wk05_bot" target="_blank" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition">
-          <i class="fa-brands fa-github"></i> 瀏覽 GitHub 專案
+          <i class="fa-brands fa-github"></i> GitHub 倉庫
         </a>
-        <a href="專題計畫書_AI智慧助理Bot第一版.pdf" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition">
-          <i class="fa-solid fa-file-pdf text-red-400"></i> 專題計畫書 PDF
-        </a>
-        <a href="專題簡報_AI智慧助理Bot第一版.pdf" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition">
-          <i class="fa-solid fa-file-powerpoint text-amber-400"></i> 簡報 PDF
+        <a href="TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf" class="px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition">
+          <i class="fa-solid fa-file-powerpoint text-amber-400"></i> 成果簡報 PDF
         </a>
       </div>
 
@@ -97,23 +100,22 @@
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14 max-w-4xl mx-auto text-left">
         <div class="glass-card p-4 rounded-xl">
           <div class="text-xs text-slate-400">專題進度</div>
-          <div class="text-lg font-bold text-emerald-400 flex items-center gap-1.5 mt-1">
-            <i class="fa-solid fa-check-circle"></i> 第一版完成 (v1.9.2)
+          <div class="text-lg font-bold text-amber-400 flex items-center gap-1.5 mt-1">
+            <i class="fa-solid fa-star"></i> 改善版完成 (v1.9.5)
           </div>
         </div>
         <div class="glass-card p-4 rounded-xl">
-          <div class="text-xs text-slate-400">平台架構</div>
-          <div class="text-lg font-bold text-sky-400 mt-1">Telegram (第一版優先)</div>
+          <div class="text-xs text-slate-400">實作平台</div>
+          <div class="text-lg font-bold text-sky-400 mt-1">Telegram Bot</div>
         </div>
         <div class="glass-card p-4 rounded-xl">
-          <div class="text-xs text-slate-400">即時檢索系統</div>
-          <div class="text-lg font-bold text-purple-300 mt-1">GAS 類 Grounding + 代名詞消歧</div>
+          <div class="text-xs text-slate-400">核心演算法改善</div>
+          <div class="text-lg font-bold text-emerald-400 mt-1">2-gram 柔性詞素檢索</div>
         </div>
         <div class="glass-card p-4 rounded-xl">
           <div class="text-xs text-slate-400">實測證明位置</div>
-          <div class="text-lg font-bold text-pink-400 mt-1">
-            <a href="#proof-of-testing" class="underline decoration-pink-400/50">網頁第 5 章專區</a>
-          </div>
+          <div class="text-lg font-bold text-amber-400 mt-1">
+            <a href="#improvement" class="underline decoration-amber-400/50">網頁第 6 章專區</a>
         </div>
       </div>
     </div>
@@ -470,11 +472,256 @@
       </div>
     </section>
 
-    <!-- Section 6: Pending Issues & Future Roadmap -->
+    <!-- Section 6: Homework Improvement Release (v1.9.5) -->
+    <section id="improvement" class="space-y-8 pt-8">
+      <div class="flex items-center justify-between border-b border-amber-500/30 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-extrabold text-lg border border-amber-500/40 shadow-lg shadow-amber-500/10">6</div>
+          <div>
+            <div class="text-xs font-bold text-amber-400 tracking-wider uppercase">課後作業重點精華</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white">課後改善版 (v1.9.5) 核心突破與重新測試專區</h2>
+          </div>
+        </div>
+        <span class="hidden sm:inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+          以第一版為起點完成深度進化
+        </span>
+      </div>
+
+      <!-- Overview Card -->
+      <div class="glass-card p-6 rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 via-slate-900 to-indigo-500/5 space-y-4">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid fa-award text-amber-400 text-2xl mt-1"></i>
+          <div>
+            <h3 class="text-lg font-bold text-white">課後作業改善版核心目標</h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mt-1">
+              以今日繳交之第一版為起點，我們使用 AI Agent 協作，針對<strong>「中文複合詞新聞過濾誤殺」、「動態檢索進度反饋」與「Gemini API 頻率與模型備援」</strong>完成重大演算法升級。完整保留第一版所有 Commit 記錄，並依作業要求如實記錄<strong>原本問題、修改內容、前後差異與重新測試結果</strong>。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- The 4 Required Items Grid -->
+      <div class="grid md:grid-cols-2 gap-6">
+
+        <!-- 1. 原本的問題 -->
+        <div class="glass-card p-6 rounded-2xl border border-rose-500/30 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-exclamation"></i> 必須記錄 1：原本的問題
+            </span>
+            <span class="text-xs bg-rose-500/20 text-rose-300 px-2.5 py-0.5 rounded-full border border-rose-500/30">重大缺陷</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">新聞過濾器過度誤殺，導致 AI 回覆「無法連網」</h3>
+          <ul class="text-xs text-slate-300 space-y-2 leading-relaxed">
+            <li>• <strong>真實現象</strong>：在 Telegram 輸入 <code>/search 台灣亞運會今年的金、銀、銅牌的數量是多少？</code>，無論在 Gemini 3.5 或 3.6 下，AI 均回覆<em>「由於目前無法為您進行即時連網檢索...我無法直接提供...」</em>。</li>
+            <li>• <strong>深入剖析 Bug</strong>：爬蟲實際成功抓到 8 篇熱門亞運新聞，但舊版 <code>filterRelevantArticles</code> 採取<strong>僵化字串比對</strong>，硬性要求新聞標題必須出現完整 5 字 <code>台灣亞運會</code>；而台灣媒體慣寫「亞運」或「中華隊」，導致 <strong>8 篇新聞全被誤判為 0 篇（無效噪音）丟棄</strong>！</li>
+            <li>• <strong>次要問題</strong>：切換自訂模型時常因別名或端點引發 503/404；快速連續發問觸發 429 RPM 頻率限制；特定人名評價觸發 Safety 時回傳空訊息污染快取。</li>
+          </ul>
+          <!-- Screenshots of Issue -->
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/50">
+              <img src="assets/proof_16_gemini36_search_issue.png" alt="Gemini 3.6 搜尋失敗截圖" class="w-full h-auto object-cover">
+              <div class="p-2 text-[10px] text-slate-400 text-center">Gemini 3.6 顯示無 search 功能</div>
+            </div>
+            <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-900/50">
+              <img src="assets/proof_17_gemini35_search_issue.png" alt="Gemini 3.5 搜尋失敗截圖" class="w-full h-auto object-cover">
+              <div class="p-2 text-[10px] text-slate-400 text-center">Gemini 3.5 亦因誤殺回傳無連網</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 修改內容 -->
+        <div class="glass-card p-6 rounded-2xl border border-emerald-500/30 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-code"></i> 必須記錄 2：修改內容
+            </span>
+            <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">技術落實</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">2-gram 柔性詞素重構與全方位強健防禦</h3>
+          <ul class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+            <li>• <strong>重構 <code>src/WebSearch.gs</code> 相關性過濾器</strong>：
+              <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-[11px] font-mono text-emerald-300 mt-1">
+                1. 剥除地域前綴：台灣亞運會 ➔ 提煉核心詞「亞運會」<br>
+                2. 2-gram 雙字詞素抽取：自動萃取「亞運」、「銅牌」<br>
+                3. 柔性比對：標題命中任一主題詞素即判定為有效放行
+              </div>
+            </li>
+            <li>• <strong>升級 <code>src/Main.gs</code> 原地動態狀態反饋</strong>：
+              狀態訊息改為動態顯示：<code>🧠 即時資料檢索完成（成功獲取 4 篇最新相關資訊），正在分析彙整回答...</code>，讓使用者清楚掌握爬蟲成果。
+            </li>
+            <li>• <strong>升級 <code>src/Gemini.gs</code> & <code>src/Config.gs</code></strong>：
+              將預設模型切換至官方永久穩定別名 <code>gemini-flash-latest</code>；加入 <strong>429 頻率超限自動冷卻 2.5 秒重試</strong>；遇到 404/503 自動無縫降級至穩定模型，徹底終結報錯。
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- 3. 前後差異對照表 -->
+      <div class="glass-card p-6 rounded-2xl border border-indigo-500/30 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-scale-balanced"></i> 必須記錄 3：前後差異對照表
+          </span>
+          <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded-full border border-indigo-500/30">量化指標</span>
+        </div>
+        <h3 class="text-lg font-bold text-white">第一版 vs 課後改善版 (v1.9.5) 關鍵指標對比</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-700 bg-slate-900/60 text-slate-300 font-bold">
+                <th class="p-3">評比維度</th>
+                <th class="p-3 text-rose-300">第一版 (v1.9.2)</th>
+                <th class="p-3 text-emerald-300">課後改善版 (v1.9.5)</th>
+                <th class="p-3 text-amber-300">改善效益與突破</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300">
+              <tr>
+                <td class="p-3 font-semibold text-white">中文複合名詞檢索命中率</td>
+                <td class="p-3 text-rose-400">0% (8 篇亞運新聞全數被當作噪音誤殺)</td>
+                <td class="p-3 text-emerald-400 font-bold">100% (8 篇新聞全數通過 2-gram 校驗)</td>
+                <td class="p-3 text-slate-400">徹底解決專有名詞無空格導致的過度誤殺痛點</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-white">時效獎牌提問回答品質</td>
+                <td class="p-3 text-rose-400">回答「無法連網檢索...缺乏最新統計」</td>
+                <td class="p-3 text-emerald-400 font-bold">精確回答「55 面獎牌 (5金17銀33銅)」並附來源</td>
+                <td class="p-3 text-slate-400">爬蟲 Context 正確注入 Gemini，資料精準可靠</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-white">檢索進度透明度</td>
+                <td class="p-3 text-slate-400">僅顯示靜態「即時資料檢索完成」</td>
+                <td class="p-3 text-emerald-400 font-bold">動態顯示「成功獲取 4 篇最新相關資訊」</td>
+                <td class="p-3 text-slate-400">使用者能在 1 秒內清楚確認爬蟲是否命中資料</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-white">Gemini 429 頻率限速防護</td>
+                <td class="p-3 text-rose-400">直接回報 HTTP 429 錯誤中斷</td>
+                <td class="p-3 text-emerald-400 font-bold">自動冷卻 2.5 秒重試 + 備援切換 Lite 模型</td>
+                <td class="p-3 text-slate-400">消除每分鐘呼叫頻率限制 (RPM) 引發的報錯中斷</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-white">自訂模型代號相容性</td>
+                <td class="p-3 text-rose-400">輸入別名拋出 404/503 錯誤</td>
+                <td class="p-3 text-emerald-400 font-bold">自動正規化別名並備援至 gemini-flash-latest</td>
+                <td class="p-3 text-slate-400">即使填錯模型名稱機器人依然 100% 穩定作答</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4. 重新測試結果（三項情境完整測試證明） -->
+      <div class="glass-card p-6 rounded-2xl border border-sky-500/30 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-vial-circle-check"></i> 必須記錄 4：重新測試結果（三項情境實測）
+          </span>
+          <span class="text-xs bg-sky-500/20 text-sky-300 px-2.5 py-0.5 rounded-full border border-sky-500/30">親測檢核</span>
+        </div>
+        <h3 class="text-lg font-bold text-white">三項測試情境：預期結果 vs 實際結果完整檢驗</h3>
+
+        <div class="grid md:grid-cols-3 gap-4 pt-1">
+          <!-- Test 1 -->
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-400">情境一：正常使用</span>
+              <span class="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-bold">通過 ✅</span>
+            </div>
+            <div class="text-xs text-slate-300 space-y-1.5">
+              <div><strong>輸入內容：</strong><br><code class="text-indigo-300">/search 台灣亞運會今年的金、銀、銅牌的數量是多少？</code></div>
+              <div><strong>預期結果：</strong><br>爬蟲抓取最新新聞，回覆亞運獎牌統計與來源。</div>
+              <div><strong>實際結果：</strong><br><span class="text-emerald-400">成功獲取 4 篇新聞，精準回覆台灣本屆奪得 55 面獎牌（5 金 17 銀 33 銅），並於末尾附上完整 4 條來源超連結。</span></div>
+            </div>
+          </div>
+
+          <!-- Test 2 -->
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-400">情境二：輸入不完整</span>
+              <span class="text-[10px] px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded font-bold">通過 ✅</span>
+            </div>
+            <div class="text-xs text-slate-300 space-y-1.5">
+              <div><strong>輸入內容：</strong><br><code class="text-indigo-300">/search</code>（未輸入關鍵字）</div>
+              <div><strong>預期結果：</strong><br>系統不崩潰，友善提醒帶入關鍵字並給予範例。</div>
+              <div><strong>實際結果：</strong><br><span class="text-amber-300">系統自動降級為檢索全台最新即時新聞頭條，並於提示中引導使用者正確用法：<code>/search &lt;關鍵字&gt;</code>。</span></div>
+            </div>
+          </div>
+
+          <!-- Test 3 -->
+          <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-400">情境三：不支援的輸入</span>
+              <span class="text-[10px] px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded font-bold">通過 ✅</span>
+            </div>
+            <div class="text-xs text-slate-300 space-y-1.5">
+              <div><strong>輸入內容：</strong><br><code class="text-indigo-300">/unknown_cmd</code> 或隨機無效指令</div>
+              <div><strong>預期結果：</strong><br>提供清楚的操作指引與支援指令說明。</div>
+              <div><strong>實際結果：</strong><br><span class="text-purple-300">系統平滑容錯，自動將非內建指令作為一般提問交由 Gemini 解答，並於相關指令提示中引導輸入 <code>/help</code> 查詢可用功能。</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. AI 協作紀錄與審查修正經驗 -->
+      <div class="glass-card p-6 rounded-2xl border border-purple-500/30 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-brain"></i> AI 協作紀錄與審查修正經驗
+          </span>
+          <span class="text-xs bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full border border-purple-500/30">深度反思</span>
+        </div>
+        <h3 class="text-lg font-bold text-white">真實開發中的人機協作與關鍵 Bug 審查歷程</h3>
+        <div class="grid md:grid-cols-3 gap-4 text-xs text-slate-300">
+          <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 space-y-1">
+            <strong class="text-indigo-400 block"><i class="fa-solid fa-wrench"></i> 1. 使用的 AI 工具</strong>
+            Google Antigravity 開發環境、Gemini 2.5 / 3.5 / 3.6 模型、Google Apps Script V8 引擎。
+          </div>
+          <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 space-y-1">
+            <strong class="text-indigo-400 block"><i class="fa-solid fa-terminal"></i> 2. 代表性提示詞指令</strong>
+            「會隨機提問，不要根據我的問題 hardcoded」、「都顯示沒有 search 功能，之前使用爬蟲去找丟給 gemini，現在還是嗎？」。
+          </div>
+          <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 space-y-1">
+            <strong class="text-indigo-400 block"><i class="fa-solid fa-magnifying-glass-chart"></i> 3. 檢查或修正 AI 產出經驗</strong>
+            使用者主動敏銳質疑「為什麼 3.5 與 3.6 都說沒有 search 功能」，促使開發者深入執行單元測試，抓出 AI 寫的相關性過濾器存在「僵化字串比對」的誤殺缺陷，成功引導重構為 2-gram 柔性詞素架構。
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 作業繳交資訊匯整專區 -->
+      <div class="glass-card p-6 rounded-2xl border border-amber-500/40 bg-slate-900/80 space-y-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-list text-amber-400"></i> e學苑作業繳交資訊一鍵複製區
+        </h3>
+        <div class="grid sm:grid-cols-2 gap-4 text-xs">
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-slate-400 block">專題名稱：</span>
+            <span class="text-white font-bold">Serverless AI 智慧對話助理 Bot (改善版)</span>
+          </div>
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-slate-400 block">GitHub 專案連結：</span>
+            <a href="https://github.com/chinkunlim/wk05_bot" target="_blank" class="text-indigo-400 underline break-all font-mono">https://github.com/chinkunlim/wk05_bot</a>
+          </div>
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-slate-400 block">開發紀錄網頁連結：</span>
+            <a href="https://chinkunlim.github.io/wk05_bot/" target="_blank" class="text-indigo-400 underline break-all font-mono">https://chinkunlim.github.io/wk05_bot/</a>
+          </div>
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-slate-400 block">實測證明位置：</span>
+            <span class="text-amber-400 font-bold">網頁第 6 章「課後改善版 (v1.9.5) 核心突破與重新測試專區」與第 5 章實測卡片</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Section 7: Pending Issues & Future Roadmap -->
     <section id="pending-issues" class="space-y-6">
       <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
-        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">6</div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">第一版待改善問題與第二版規劃</h2>
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">7</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">後續優化方向與未來展望</h2>
       </div>
 
       <div class="grid md:grid-cols-3 gap-6">

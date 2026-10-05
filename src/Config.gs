@@ -4,8 +4,8 @@
  */
 
 const CONFIG = {
-  // 預設 Gemini 模型 (若指令碼屬性中未設定 GEMINI_MODEL 時的備援預設值)
-  DEFAULT_GEMINI_MODEL: 'gemini-2.0-flash',
+  // 預設 Gemini 模型 (官方永久別名，保證即時可用且免費用量穩定)
+  DEFAULT_GEMINI_MODEL: 'gemini-flash-latest',
   
   // Gemini REST API 端點基礎網址
   GEMINI_API_BASE_URL: 'https://generativelanguage.googleapis.com/v1beta/models',
@@ -33,15 +33,24 @@ const CONFIG = {
 let _cachedEnv = null;
 
 /**
- * 自動標準化使用者輸入之模型名稱，容錯處理空格、大小寫與前綴缺漏
+ * 自動標準化使用者輸入之模型名稱，容錯處理空格、大小寫、前綴缺漏與已棄用端點別名
  * 例如："3.8 flash" ➔ "gemini-3.8-flash"
- *       "3.5-flash" ➔ "gemini-3.5-flash"
- *       "gemini-2.5-flash" ➔ "gemini-2.5-flash"
+ *       "2.5" / "2.5-flash" ➔ "gemini-flash-latest" (轉移至官方活體別名)
+ *       "lite" ➔ "gemini-flash-lite-latest"
  */
 function normalizeModelName(raw) {
   if (!raw) return CONFIG.DEFAULT_GEMINI_MODEL;
   let s = String(raw).trim().toLowerCase();
   s = s.replace(/[\s_]+/g, '-');
+
+  // 常見別名轉移至官方推薦之永久穩定別名
+  if (['2.5', '2.0', 'gemini-2.5', 'gemini-2.0', 'gemini-2.5-flash', 'gemini-2.0-flash', 'flash-latest', 'latest'].includes(s)) {
+    return 'gemini-flash-latest';
+  }
+  if (['lite', 'flash-lite', 'gemini-flash-lite', 'lite-latest', '2.5-lite'].includes(s)) {
+    return 'gemini-flash-lite-latest';
+  }
+
   if (/^[0-9]/.test(s)) {
     s = 'gemini-' + s;
   } else if (!s.startsWith('gemini-') && !s.startsWith('gemma-') && !s.startsWith('lyria-') && !s.startsWith('nano-') && !s.startsWith('antigravity-') && !s.startsWith('deep-research-')) {

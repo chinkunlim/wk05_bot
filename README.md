@@ -1,10 +1,10 @@
-# 🤖 Serverless AI 智慧對話助理 Bot (第一版)
+# 🤖 Serverless AI 智慧對話助理 Bot (課後改善版 v1.9.5)
 
-> **期中專題 第一版作業成果**
-> - 📄 **專題計畫書**：[專題計畫書_AI智慧助理Bot第一版.pdf](專題計畫書_AI智慧助理Bot第一版.pdf)
-> - 📊 **專題簡報**：[專題簡報_AI智慧助理Bot第一版.pdf](專題簡報_AI智慧助理Bot第一版.pdf)
-> - 🌐 **開發紀錄網頁**：[index.html (含實測證明專區)](https://chinkunlim.github.io/wk05_bot/)
-> - 🔍 **實測證明章節**：位於開發紀錄網頁的 **【第 5 章：實測證明與對話成果展示 (#proof-of-testing)】**
+> **課後作業改善版成果（保留第一版 commit 並完成實測突破）**
+> - 📊 **成果簡報 PDF**：[TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf](TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf)
+> - 📄 **第一版專題計畫書**：[專題計畫書_AI智慧助理Bot第一版.pdf](專題計畫書_AI智慧助理Bot第一版.pdf)
+> - 🌐 **開發紀錄網頁**：[index.html (含改善版成果與實測證明)](https://chinkunlim.github.io/wk05_bot/)
+> - 🔍 **改善版實測證明**：位於開發紀錄網頁的 **【第 6 章：課後改善版 (v1.9.5) 核心突破與重新測試專區 (#improvement)】** 與第 5 章
 > - 📦 **GitHub 專案**：[https://github.com/chinkunlim/wk05_bot](https://github.com/chinkunlim/wk05_bot)
 
 ---

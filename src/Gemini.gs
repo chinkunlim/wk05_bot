@@ -244,7 +244,7 @@ function callGemini(userId, userPrompt, customGrounding = null) {
         };
       }
 
-      // 若是因 Google Search Grounding 觸發的 429 配額限制或工具不支援錯誤，自動移除 tools 降級重發！
+      // 1. 若是因 Google Search Grounding 觸發的 429 配額限制或工具不支援錯誤，自動移除 tools 降級重發！
       if (payload.tools && (statusCode === 429 || (statusCode === 400 && responseText.includes('tool')))) {
         Logger.log(`⚠️ 偵測到 Google Search Grounding 額度限制 (HTTP ${statusCode})，自動降級為標準生成模式重試...`);
         delete payload.tools;
@@ -253,16 +253,27 @@ function callGemini(userId, userPrompt, customGrounding = null) {
         continue;
       }
 
-      // 若是因自訂模型不存在或端點不可用 (503 或 404)，且自訂模型不等於預設模型，進行自動容錯降級重試！
-      if ((statusCode === 503 || statusCode === 404) && modelName !== CONFIG.DEFAULT_GEMINI_MODEL && !isModelFallback) {
-        Logger.log(`⚠️ 自訂模型「${modelName}」請求失敗 (HTTP ${statusCode})，自動切換為預設穩定模型「${CONFIG.DEFAULT_GEMINI_MODEL}」重試...`);
+      // 2. 若是因自訂模型不存在或端點不可用 (404 或 503)，自動切換至官方永久穩定模型 (gemini-flash-latest) 重試！
+      if ((statusCode === 404 || statusCode === 503) && !isModelFallback) {
+        Logger.log(`⚠️ 模型「${modelName}」請求失敗 (HTTP ${statusCode})，自動切換為官方永久穩定模型「${CONFIG.DEFAULT_GEMINI_MODEL}」重試...`);
         isModelFallback = true;
         url = `${CONFIG.GEMINI_API_BASE_URL}/${CONFIG.DEFAULT_GEMINI_MODEL}:generateContent?key=${env.geminiApiKey}`;
         continue;
       }
 
-      // 若遇到 Google 伺服器過載 (500, 502, 503, 504)，且還有重試次數，進行重試
-      if ([500, 502, 503, 504].includes(statusCode) && attempt < maxRetries) {
+      // 3. 若遇到 429 頻率超限 (RPM Rate Limit)，自動冷卻等待 2.5 秒，並無縫切換至最高吞吐量之 Lite 模型重試！
+      if (statusCode === 429 && attempt < maxRetries) {
+        Logger.log(`⏳ 遇到 429 頻率限制 (RPM)，自動冷卻 2.5 秒並切換至高配額模型重試...`);
+        Utilities.sleep(2500);
+        if (!isModelFallback) {
+          isModelFallback = true;
+          url = `${CONFIG.GEMINI_API_BASE_URL}/gemini-flash-lite-latest:generateContent?key=${env.geminiApiKey}`;
+        }
+        continue;
+      }
+
+      // 4. 若遇到 Google 伺服器暫態過載 (500, 502, 504)，進行常規重試
+      if ([500, 502, 504].includes(statusCode) && attempt < maxRetries) {
         Logger.log(`⚠️ Gemini 伺服器繁忙 (HTTP ${statusCode})，準備重試...`);
         continue;
       }
