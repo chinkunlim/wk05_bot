@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-10-05
+
+### Added
+- **GAS 雲端原生「類 Grounding」即時資料檢索系統 (`src/WebSearch.gs`)**：
+  - 繞過官方 Search Grounding 429 額度限制，完全在 GAS 免費額度內（每日 20,000 次 `UrlFetchApp`）自主抓取 Google News RSS 即時時事新聞。
+  - **智慧意圖偵測**：自動比對「今天、最新、新聞、賽事、颱風、天氣、今年」等時效性關鍵詞，或透過 `/search <關鍵字>`、`/news` 指令雙軌觸發檢索。
+  - **資料清洗與去雜訊**：自動去除 HTML 標籤與無效廣告，精簡內文於 1200 字以內，極致保護 Token 用量。
+  - **Prompt 上下文注入與來源引注**：將檢索資訊包裝為背景資料注入當前問題，並在回覆末尾自動生成可點擊之 `🔍 即時檢索來源（GAS 雲端即時資訊）`。
+  - **單元測試函式**：內建 `testCustomGrounding()`，供開發者在 GAS 編輯器直接一鍵驗證檢索效果。
+
 ## [1.7.0] - 2026-10-05
 
 ### Added

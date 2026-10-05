@@ -7,9 +7,10 @@
  * 呼叫 Gemini API 產生回覆，並維護短期對話記憶
  * @param {string|number} userId Telegram 使用者 ID
  * @param {string} userPrompt 使用者當前提問
+ * @param {Object|null} customGrounding 自建類 Grounding 檢索資料 { contextText, sources }
  * @returns {Object} 包含 success, text, tokens, error
  */
-function callGemini(userId, userPrompt) {
+function callGemini(userId, userPrompt, customGrounding = null) {
   const env = getEnv();
   if (!env.geminiApiKey) {
     return {
@@ -38,9 +39,13 @@ function callGemini(userId, userPrompt) {
 
   // 檢查是否為「繼續」意圖 (例如：繼續、請繼續、continue、接著說 等)
   const isContinuation = /^(繼續|请继续|請繼續|continue|接著說|接著寫|接續|往下說)$/i.test(userPrompt.trim());
-  const actualPrompt = isContinuation
-    ? '請緊接著上一段回覆中斷的地方繼續往下說明，不要重複前面已經說過的內容，直接無縫接續後續重點。'
-    : userPrompt;
+  let actualPrompt = userPrompt;
+
+  if (isContinuation) {
+    actualPrompt = '請緊接著上一段回覆中斷的地方繼續往下說明，不要重複前面已經說過的內容，直接無縫接續後續重點。';
+  } else if (customGrounding && customGrounding.contextText) {
+    actualPrompt = `【即時外部檢索資料】\n${customGrounding.contextText}\n\n【使用者問題】\n${userPrompt}\n\n請以繁體中文，綜合參考上述最新檢索到的即時外部資料，為使用者提供詳細、準確且客觀的回答。`;
+  }
 
   // 加入當前使用者的問題
   contents.push({
@@ -157,12 +162,15 @@ function callGemini(userId, userPrompt) {
           }
         });
 
-        let sourcesHtml = sources.length > 0
-          ? '\n\n🔍 <b>參考來源：</b>\n• ' + sources.slice(0, 4).join('\n• ')
-          : '';
-
-        // 若是由於 429 降級為基礎模型回答，提示使用者
-        if (isGroundingFallback) {
+        let sourcesHtml = '';
+        if (sources.length > 0) {
+          sourcesHtml = '\n\n🔍 <b>參考來源：</b>\n• ' + sources.slice(0, 4).join('\n• ');
+        } else if (customGrounding && customGrounding.sources && customGrounding.sources.length > 0) {
+          // 自建類 Grounding 來源
+          const customList = customGrounding.sources.slice(0, 4).map(s => `<a href="${s.url}">${s.title}</a>`);
+          sourcesHtml = '\n\n🔍 <b>即時檢索來源（GAS 雲端即時資訊）：</b>\n• ' + customList.join('\n• ');
+        } else if (isGroundingFallback) {
+          // 若是由於官方 Grounding 429 降級且無自建檢索
           sourcesHtml = '\n\n<i>ℹ️（註：Google 免費帳號未開通即時搜尋額度，本回答依據 AI 模型基礎知識庫為您解答）</i>';
         }
 

@@ -52,13 +52,16 @@ function doPost(e) {
       
       switch (command) {
         case '/start':
-          const startMsg = `👋 <b>歡迎使用 Gemini AI 助理！</b>\n\n我是由 Google Gemini 驅動的 Telegram 機器人，支援短期對話記憶與日常問答。\n\n📌 <b>常用指令：</b>\n/status - 查詢今日剩餘提問額度\n/reset - 清除上下文對話記憶\n/help - 顯示指令說明\n\n請隨時直接傳送文字訊息向我提問！`;
+          const startMsg = `👋 <b>歡迎使用 Gemini AI 助理！</b>\n\n我是由 Google Gemini 驅動的 Telegram 機器人，支援短期對話記憶、即時新聞檢索與日常問答。\n\n📌 <b>常用指令：</b>\n/search &lt;關鍵字&gt; - 即時檢索最新新聞並總結\n/news - 查看今日最新新聞頭條\n/status - 查詢今日剩餘提問額度\n/reset - 清除上下文對話記憶\n/help - 顯示指令說明\n\n請隨時直接傳送文字訊息向我提問！`;
           sendTelegramMessage(chatId, startMsg, messageId);
           return HtmlService.createHtmlOutput('OK');
 
         case '/help':
           const helpMsg = `📖 <b>Gemini Bot 使用說明</b>\n\n` +
             `• <b>一般提問</b>：直接輸入任何問題，機器人會自動帶入前幾次對話脈絡進行回答。\n` +
+            `• <b>即時資訊檢索</b>：詢問包含「今天、最新、新聞、賽事」等關鍵詞時，系統會自動透過雲端檢索最新資訊！\n` +
+            `• <b>/search &lt;關鍵字&gt;</b>：主動搜尋特定主題之最新新聞。\n` +
+            `• <b>/news</b>：檢索台灣最新即時新聞頭條。\n` +
             `• <b>/status</b>：查看今日已提問次數與剩餘配額（每日自動重置）。\n` +
             `• <b>/reset</b>：若想開啟全新的主題，輸入此指令即可忘記前幾則對話。\n` +
             `• <b>/help</b>：查看本說明清單。`;
@@ -82,6 +85,11 @@ function doPost(e) {
           sendTelegramMessage(chatId, resetMsg, messageId);
           return HtmlService.createHtmlOutput('OK');
 
+        case '/search':
+        case '/news':
+          // 搜尋指令直接進入下方配額檢查與檢索生成流程
+          break;
+
         default:
           // 未知指令，忽略或提示
           break;
@@ -98,8 +106,15 @@ function doPost(e) {
     // 4. 發送「正在輸入中」提示
     sendChatAction(chatId, 'typing');
 
-    // 5. 呼叫 Gemini API 取得回覆
-    const geminiResult = callGemini(userId, text);
+    // 5. 檢索增強 (類 Grounding)：若開啟且偵測到時效意圖或搜尋指令，透過 GAS 抓取最新資訊
+    let customGrounding = null;
+    if (env.enableCustomGrounding && shouldTriggerSearch(text)) {
+      Logger.log(`🌐 偵測到時效意圖，透過 GAS 發動即時檢索...`);
+      customGrounding = fetchLatestWebInfo(text, CONFIG.SEARCH_MAX_RESULTS || 4);
+    }
+
+    // 6. 呼叫 Gemini API 取得回覆
+    const geminiResult = callGemini(userId, text, customGrounding);
 
     if (geminiResult.success) {
       // 6. 寫入問答日誌至 Google Sheets

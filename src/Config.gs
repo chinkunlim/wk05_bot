@@ -20,7 +20,13 @@ const CONFIG = {
   CACHE_EXPIRATION_SECONDS: 1200,
   
   // 試算表日誌分頁名稱
-  SHEET_NAME: '問答日誌'
+  SHEET_NAME: '問答日誌',
+
+  // 自建類 Grounding 即時檢索開關 (預設 true)
+  ENABLE_CUSTOM_GROUNDING: true,
+
+  // 每次檢索最大新聞篇數
+  SEARCH_MAX_RESULTS: 4
 };
 
 // 單次請求記憶體快取，避免重複呼叫 PropertiesService 增加延遲
@@ -46,7 +52,8 @@ function getEnv() {
       .filter(id => id.length > 0),
     maxDailyRequests: parseInt(props.getProperty('MAX_DAILY_REQUESTS') || '50', 10),
     webhookUrl: props.getProperty('WEBHOOK_URL') || '',
-    enableGoogleSearch: props.getProperty('ENABLE_GOOGLE_SEARCH') !== 'false' // 預設開啟聯網搜尋
+    enableGoogleSearch: props.getProperty('ENABLE_GOOGLE_SEARCH') !== 'false', // 官方 Grounding
+    enableCustomGrounding: props.getProperty('ENABLE_CUSTOM_GROUNDING') !== 'false' // GAS 自建類 Grounding
   };
 
   return _cachedEnv;
@@ -65,7 +72,8 @@ function initProperties() {
   const currentUsers = props.getProperty('ALLOWED_USER_IDS') || '你的_TELEGRAM_USER_ID';
   const currentDailyLimit = props.getProperty('MAX_DAILY_REQUESTS') || '50';
   const currentWebhookUrl = props.getProperty('WEBHOOK_URL') || '';
-  const currentSearch = props.getProperty('ENABLE_GOOGLE_SEARCH') || 'true';
+  const currentSearch = props.getProperty('ENABLE_GOOGLE_SEARCH') || 'false';
+  const currentCustomGrounding = props.getProperty('ENABLE_CUSTOM_GROUNDING') || 'true';
 
   props.setProperties({
     'TELEGRAM_BOT_TOKEN': currentToken,
@@ -74,7 +82,8 @@ function initProperties() {
     'ALLOWED_USER_IDS': currentUsers,
     'MAX_DAILY_REQUESTS': currentDailyLimit,
     'WEBHOOK_URL': currentWebhookUrl,
-    'ENABLE_GOOGLE_SEARCH': currentSearch
+    'ENABLE_GOOGLE_SEARCH': currentSearch,
+    'ENABLE_CUSTOM_GROUNDING': currentCustomGrounding
   });
 
   _cachedEnv = null; // 清空快取
@@ -83,6 +92,7 @@ function initProperties() {
   Logger.log('TELEGRAM_BOT_TOKEN: ' + (props.getProperty('TELEGRAM_BOT_TOKEN') ? '已設定 (隱藏)' : '未設定'));
   Logger.log('GEMINI_API_KEY: ' + (props.getProperty('GEMINI_API_KEY') ? '已設定 (隱藏)' : '未設定'));
   Logger.log('GEMINI_MODEL: ' + props.getProperty('GEMINI_MODEL'));
+  Logger.log('ENABLE_CUSTOM_GROUNDING: ' + props.getProperty('ENABLE_CUSTOM_GROUNDING'));
   Logger.log('ENABLE_GOOGLE_SEARCH: ' + props.getProperty('ENABLE_GOOGLE_SEARCH'));
   Logger.log('ALLOWED_USER_IDS: ' + props.getProperty('ALLOWED_USER_IDS'));
   Logger.log('MAX_DAILY_REQUESTS: ' + props.getProperty('MAX_DAILY_REQUESTS'));
