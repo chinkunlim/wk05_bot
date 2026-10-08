@@ -2,17 +2,26 @@
 .DS_Store
 Thumbs.db
 
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
 # Node.js
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Clasp / Environment
-.clasp.json
+# Secrets & Environment
 .env
 *.log
 
-# Editor directories
-.vscode/
+# IDE personal files
 .idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json

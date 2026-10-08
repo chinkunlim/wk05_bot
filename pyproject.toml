@@ -1,0 +1,27 @@
+[project]
+name = "wk05-bot"
+version = "1.9.5"
+description = "Serverless AI Smart Chat Assistant Bot on Google Apps Script and Telegram with Gemini Flash"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Jinkun Lim" }
+]
+dependencies = []
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.3.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

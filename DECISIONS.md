@@ -155,4 +155,17 @@
 - **後果**：
   - **優點**：徹底解決中文複合詞新聞搜尋落空問題，實測命中率由 0% 提升至 100%，有效保障爬蟲資料順暢餵入 Gemini。
 
+---
 
+## ADR-016: 生產級專案目錄架構重構 (Standardized Repository Architecture)
+
+- **狀態**：Accepted (已採納)
+- **背景**：原專案雖然程式碼與展示功能完整，但對話紀錄、成果 PDF、計畫書與作業文件散落在根目錄，缺乏標準化工程治理規範與自動化測試流水線，且與主流 Python / Agentic 開發目錄架構缺乏一致性。
+- **決定**：
+  1. **導入專業工程治理**：設置 `.github/workflows/ci.yml`、`.github/CONTRIBUTING.md`、`.github/SECURITY.md`、`.vscode/` 與 `.cursorrules`。
+  2. **對話溯源儲存庫 (`conversations/`)**：拆分 `raw/` 存放原始會話記錄與 `summaries/` 存放結構化里程碑摘要，並建立索引說明。
+  3. **成果交付目錄 (`reports/`)**：成果簡報 PDF、計畫書 PDF 與作業需求 Word 統一歸檔至 `reports/`。
+  4. **深度架構文檔庫 (`docs/`)**：新增 `ARCHITECTURE.md`、`TOOLS.md`、`CONTEXT.md`、`DEPLOYMENT.md`、`PROMPT_TEMPLATES.md`，並維持 GitHub Pages 展示網頁正常發布。
+  5. **自動化測試工具鏈 (`tests/`, `evals/`, `pyproject.toml`, `Makefile`)**：透過 `uv` 與 `pytest` 提供 JavaScript 語法檢查、文檔完整性驗證、Payload 結構模擬與 LLM 評估基準集。
+- **後果**：
+  - **優點**：專案結構高度專業、規範嚴謹、溯源清晰，且 100% 保留現有 Google Apps Script 與 Telegram 核心功能的可執行性與部署便利性。

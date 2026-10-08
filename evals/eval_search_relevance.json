@@ -1,0 +1,17 @@
+[
+  {
+    "eval_id": "search_001",
+    "description": "中文複合專有名詞與時效性獎牌統計檢索評估",
+    "query": "/search 台灣亞運會今年的金、銀、銅牌的數量是多少？",
+    "sub_tokens_extracted": ["亞運", "銅牌", "獎牌"],
+    "expected_metrics": {
+      "articles_recalled_minimum": 4,
+      "gold_medals": 5,
+      "silver_medals": 17,
+      "bronze_medals": 33,
+      "total_medals": 55,
+      "includes_clickable_sources": true
+    },
+    "benchmark_status": "PASSED (proof_10)"
+  }
+]

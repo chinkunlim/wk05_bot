@@ -1,0 +1,22 @@
+[
+  {
+    "eval_id": "coref_001",
+    "description": "多輪代名詞指代消歧義評估：推薦經典書籍後追問第一本自學時間",
+    "turns": [
+      {
+        "turn": 1,
+        "role": "user",
+        "input": "推薦 3 本適合零基礎學習 Python 的經典書籍，並簡短說明推薦原因。",
+        "expected_entities": ["Python 程式設計從入門到實踐", "讓工作自動化的 Python 程式設計"]
+      },
+      {
+        "turn": 2,
+        "role": "user",
+        "input": "你推薦的第一本，如果每天花 1 小時自學，大約要多久可以讀完？",
+        "expected_resolved_subject": "Python 程式設計從入門到實踐 (Python Crash Course)",
+        "expected_time_estimate": "約 70 至 90 小時 (2.5 ~ 3 個月)"
+      }
+    ],
+    "benchmark_status": "PASSED (proof_18 & proof_19)"
+  }
+]

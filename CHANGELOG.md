@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.6] - 2026-10-08
+
+### Added
+- **生產級標準化專案目錄架構重構 (Standardized Folder Layout)**：
+  - 建立 `.github/workflows/ci.yml`、`.github/CONTRIBUTING.md` 與 `.github/SECURITY.md`，導入 CI 自動化測試與工程協作治理規範。
+  - 建立 `.vscode/` (`settings.json`, `launch.json`) 與 `.cursorrules`，提供標準化開發環境與 AI Agent 編程行為約束。
+  - 建立 `conversations/` 對話溯源儲存庫（包含 `raw/` 原始全流程會話與 `summaries/` 結構化里程碑摘要報告）。
+  - 建立 `reports/` 目錄集中收納成果簡報 PDF、專題計畫書 PDF 與作業規範 Word 檔。
+  - 建立 `docs/` 深度架構文檔庫（新增 `ARCHITECTURE.md`、`TOOLS.md`、`CONTEXT.md`、`DEPLOYMENT.md`、`PROMPT_TEMPLATES.md`）。
+  - 導入 Python / `uv` 依賴管理 (`.python-version`, `pyproject.toml`, `uv.lock`, `Makefile`)，提供自動化 JavaScript 語法測試、文檔死鏈檢查與 Payload 結構模擬。
+  - 建立 `evals/` 評估基準集（多輪代名詞消歧義、2-gram 新聞關鍵詞召回、邊界異常容錯）。
+
+### Changed
+- 更名修復拼寫錯誤：將 `KNOW_ISSUES.md` 更名為標準 `KNOWN_ISSUES.md`。
+- 更新 `README.md` 目錄結構樹與超連結路徑。
+
 ## [1.9.5] - 2026-10-05
 
 ### Fixed

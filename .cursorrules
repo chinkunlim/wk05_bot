@@ -1,0 +1,23 @@
+# Cursor & AI Agent Project Coding Rules
+
+You are working on the `wk05_bot` codebase — a 100% Serverless AI Chat Assistant built for Google Apps Script (GAS) and Telegram.
+
+## 1. Absolute Architecture Constraints
+- **Zero Dependency in GAS**: All `.gs` files in `src/` must be vanilla JavaScript compatible with Google Apps Script V8 Engine.
+- **No Node.js Builtins in `src/`**: Do NOT use `require('fs')`, `process.env`, `Buffer`, or npm modules like `axios`/`node-fetch` in `src/`. Always use GAS native `UrlFetchApp.fetch()`, `PropertiesService`, `SpreadsheetApp`, and `CacheService`.
+- **Global Shared Namespace**: In GAS, all functions and variables in `.gs` files share one global namespace. Use descriptive function names (e.g., `sendTelegramMessage` instead of `send`).
+- **Zero Hardcoding**: NEVER hardcode API keys, bot tokens, personal user IDs, or specific domain entities into the source code.
+- **Quota Safety First**: Any call to Gemini API MUST be protected by whitelist check (`isUserAllowed`) and daily rate limiter (`checkAndIncrementDailyQuota`).
+
+## 2. In-place Progress Notification
+- Always use `editMessageText` (`editTelegramMessage`) to dynamically evolve the progress in place (`收到` -> `檢索中` -> `思考中` -> `最終解答`) to prevent spamming the user's chat.
+
+## 3. Grounding & Search Logic
+- Queries to Google News RSS must use 2-gram sub-token extraction and prefix stripping.
+- Always include `return result;` in `fetchLatestWebInfo`.
+- Grounding context must be cleanly injected and format real clickable URLs at the end.
+
+## 4. Testing & Verification
+- Run `make test` or `pytest tests/` before committing.
+- Run `make check-gas` to ensure JavaScript syntax validity across all 7 `.gs` files.
+- Ensure all markdown links in `docs/` and `README.md` remain valid.

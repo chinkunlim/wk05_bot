@@ -1,0 +1,30 @@
+[
+  {
+    "eval_id": "edge_001",
+    "description": "無參數 /search 指令容錯與用法提示",
+    "input": "/search",
+    "expected_behavior": "不拋錯崩潰，發送友善說明並展示 /search <關鍵字> 範例",
+    "benchmark_status": "PASSED (proof_20)"
+  },
+  {
+    "eval_id": "edge_002",
+    "description": "無參數 /weather 指令容錯與氣候科普",
+    "input": "/weather",
+    "expected_behavior": "引導輸入城市名稱，主動補充當季氣候特徵與中央氣象署連結",
+    "benchmark_status": "PASSED (proof_21)"
+  },
+  {
+    "eval_id": "edge_003",
+    "description": "模型 404/503 或未開放端點自動無縫降級",
+    "input": "/weather (with GEMINI_MODEL=gemini-3.5-flash)",
+    "expected_behavior": "提示自訂模型無回應，自動切換為 gemini-flash-latest 解答",
+    "benchmark_status": "PASSED (proof_21)"
+  },
+  {
+    "eval_id": "edge_004",
+    "description": "每日額度查詢指令",
+    "input": "/status",
+    "expected_behavior": "精確顯示本日日期、已用次數、剩餘次數與每日上限",
+    "benchmark_status": "PASSED (proof_22)"
+  }
+]

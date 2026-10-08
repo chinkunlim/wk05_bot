@@ -1,0 +1,51 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js for GAS JavaScript Syntax Check
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+
+    - name: Install Python Dependencies
+      run: |
+        uv pip install --system pytest ruff
+
+    - name: Validate Google Apps Script Syntax (Node VM Sandbox)
+      run: |
+        node -e "
+        const fs = require('fs');
+        const vm = require('vm');
+        const files = ['Config.gs', 'Telegram.gs', 'WebSearch.gs', 'Gemini.gs', 'QuotaManager.gs', 'Storage.gs', 'Main.gs'];
+        for (const file of files) {
+          const code = fs.readFileSync('src/' + file, 'utf8');
+          new vm.Script(code, { filename: file });
+          console.log('✅ ' + file + ' 語法通過');
+        }
+        "
+
+    - name: Run Test Suite (pytest)
+      run: |
+        pytest -v tests/

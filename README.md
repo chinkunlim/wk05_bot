@@ -155,25 +155,76 @@
 
 ```
 wk05_bot/
-├── src/
-│   ├── Config.gs           # 屬性設定、白名單與環境變數管理
-│   ├── Telegram.gs         # Telegram API 互動、長文字智慧切割、Webhook 註冊與 editMessageText
-│   ├── WebSearch.gs        # 雲端原生類 Grounding 即時檢索、代名詞消歧義與相關性過濾
-│   ├── Gemini.gs           # Gemini REST API 呼叫、模型清單查詢 (listGeminiModels) 與 Token 統計
-│   ├── QuotaManager.gs     # 白名單判定與每日配額累積防護
-│   ├── Storage.gs          # 試算表自動初始化、日誌寫入與 CacheService 快取管理
-│   └── Main.gs             # Webhook 進入點 (doPost, doGet)、漸進式動態回饋與指令路由
-├── docs/                   # GitHub Pages 網站源碼 (包含 plan.html, slides.html, assets/)
-├── index.html              # 根目錄開發紀錄網頁 (自動導向至 docs/)
-├── appsscript.json         # Apps Script 資訊清單 (V8 引擎、台北時區)
-├── 專題計畫書_AI智慧助理Bot第一版.pdf # 完整專題企劃規格書
-├── LINEBot-AI智慧助理Bot第一版-成果簡報.pdf # 第一版成果簡報
-├── TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf # 課後改善版成果簡報 (v1.9.5)
-├── README.md               # 專案詳細安裝與操作手冊 (本文件)
-├── DECISIONS.md            # 架構設計決策記錄 (ADR-001 ~ ADR-012)
-├── CHANGELOG.md            # 版本變更記錄 (v1.0 ~ v1.9.2)
-├── KNOW_ISSUES.md          # 已知限制、問題排解與平臺選型分析
-└── AGENTS.md               # 專案規範與 AI Agent 維護指引
+├── .python-version              # 鎖定 Python Runtime (3.11.10)
+├── pyproject.toml               # uv / pytest / ruff 專案設定與依賴
+├── uv.lock                      # uv 精準依賴鎖定檔
+├── .gitignore                   # Git 排除清單 (.venv, .env, __pycache__)
+├── .env.example                 # 雲端 Script Properties 環境變數範本
+├── Makefile                     # 一鍵常用指令 (make test, make check-gas, make render-pdf)
+├── LICENSE                      # MIT 開源授權條款
+├── appsscript.json              # Apps Script 資訊清單 (V8 引擎、台北時區)
+│
+├── .vscode/                     # VS Code 開發環境配置
+│   ├── settings.json            # 格式化、縮排與 Python 直譯器綁定
+│   └── launch.json              # 測試與除錯啟動組態
+├── .cursorrules                 # AI Agent / Cursor 專案編程規範與架構鐵律
+│
+├── .github/                     # GitHub 雲端自動化與協作治理規範
+│   ├── workflows/
+│   │   └── ci.yml               # GitHub Actions CI 自動化流水線
+│   ├── CONTRIBUTING.md          # 貢獻與 PR 提交指南
+│   └── SECURITY.md              # 資安通報政策與金鑰外洩防護
+│
+├── README.md                    # 專案入口快速上手文件 (本文件)
+├── AGENTS.md                    # Agent 角色定義、職責權限與協作協定
+├── WORKFLOW_GUIDE.md            # 標準作業程序 (SOP：開發、部署、發布與回滾)
+├── CHANGELOG.md                 # 版本變更記錄 (v1.0 ~ v1.9.5)
+├── DECISIONS.md                 # 架構重大決策記錄 (ADR-001 ~ ADR-015)
+├── KNOWN_ISSUES.md              # 已知問題、除錯避障與平台選型分析
+│
+├── src/                         # 雲端原生應用程式核心原始碼 (Google Apps Script)
+│   ├── Config.gs                # 屬性設定、白名單與環境變數管理
+│   ├── Telegram.gs              # Telegram API 互動、長文字智慧切割與 editMessageText
+│   ├── WebSearch.gs             # 雲端原生類 Grounding 即時檢索、2-gram 柔性詞素過濾
+│   ├── Gemini.gs                # Gemini REST API 串接、429 退避與 404/503 自動備援
+│   ├── QuotaManager.gs          # 白名單判定與每日配額累積防護
+│   ├── Storage.gs               # 試算表自動初始化、日誌寫入與 CacheService 快取管理
+│   └── Main.gs                  # Webhook 進入點 (doPost, doGet)、漸進式動態回饋與指令路由
+│
+├── docs/                        # 深度架構文檔與 GitHub Pages 展示網頁
+│   ├── ARCHITECTURE.md          # 系統架構拓撲圖與服務時序圖
+│   ├── TOOLS.md                 # 自訂工具庫規範與介面定義
+│   ├── CONTEXT.md               # 系統全域背景 (專供 Agent 快速吸收)
+│   ├── DEPLOYMENT.md            # Google Apps Script 雲端部署與維運手冊
+│   ├── PROMPT_TEMPLATES.md      # 提示詞範本與調教手冊
+│   ├── index.html               # 開發紀錄展示網頁 (GitHub Pages 部署檔)
+│   ├── slides.html              # 成果簡報 16:9 HTML 原始碼 (純向量、0豆腐塊)
+│   ├── plan.html                # 專題計畫書 A4 HTML 原始碼
+│   └── assets/                  # 實測截圖與素材庫 (proof_01 ~ proof_22)
+│
+├── reports/                     # 專題成果報告與簡報歸檔
+│   ├── TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf # 課後改善版簡報 PDF (16:9)
+│   ├── LINEBot-AI智慧助理Bot第一版-成果簡報.pdf     # 第一版成果簡報 PDF
+│   ├── 專題計畫書_AI智慧助理Bot第一版.pdf          # 完整專題企劃規格書 PDF
+│   └── 02-課後作業-LINEBot開發與成果展示.docx      # 原始作業規範說明書
+│
+├── tests/                       # 自動化測試套件 (pytest + Node VM)
+│   ├── __init__.py
+│   ├── test_gas_syntax.py       # 自動檢驗 7 個 .gs 檔案之 JavaScript 語法
+│   ├── test_docs_integrity.py   # 自動檢測所有 Markdown 檔案與實測截圖完整性
+│   └── test_payload_mocks.py    # 模擬測試 Telegram Webhook 與 Gemini API Payload
+│
+├── evals/                       # LLM / Agent 提示詞評估集與 Benchmark
+│   ├── eval_coreference.json    # 多輪代名詞指代消歧義評估集
+│   ├── eval_search_relevance.json # 2-gram 複合詞新聞檢索召回評估集
+│   └── eval_edge_cases.json     # 邊界容錯與自動備援評估集
+│
+└── conversations/               # 專案對話溯源儲存庫
+    ├── README.md                # 對話紀錄索引與查閱說明
+    ├── raw/                     # 歷次開發對話完整原始 Markdown 記錄
+    │   └── 001_development_and_debugging.md # 全流程開發與除錯原始會話
+    └── summaries/               # 每段對話對應的獨立摘要報告
+        └── 001_development_and_debugging_summary.md # 結構化關鍵決策與 Bug 修復摘要
 ```
 
 ---
@@ -227,5 +278,5 @@ wk05_bot/
 - 📦 **GitHub 專案倉庫**：[https://github.com/chinkunlim/wk05_bot](https://github.com/chinkunlim/wk05_bot)
 - 🌐 **開發紀錄網頁 (GitHub Pages)**：[https://chinkunlim.github.io/wk05_bot/](https://chinkunlim.github.io/wk05_bot/)
 - 🔍 **實測證明章節錨點**：[開發紀錄網頁第 5 章 (#proof-of-testing)](https://chinkunlim.github.io/wk05_bot/#proof-of-testing)
-- 📄 **專題計畫書 PDF**：[專題計畫書_AI智慧助理Bot第一版.pdf](專題計畫書_AI智慧助理Bot第一版.pdf)
-- 📊 **專題成果簡報 PDF**：[TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf](TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf)（課後改善版）/ [LINEBot-AI智慧助理Bot第一版-成果簡報.pdf](LINEBot-AI智慧助理Bot第一版-成果簡報.pdf)（第一版）
+- 📄 **專題計畫書 PDF**：[專題計畫書_AI智慧助理Bot第一版.pdf](reports/專題計畫書_AI智慧助理Bot第一版.pdf)
+- 📊 **專題成果簡報 PDF**：[TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf](TelegramBot-AI智慧助理Bot改善版-成果簡報.pdf)（課後改善版）/ [LINEBot-AI智慧助理Bot第一版-成果簡報.pdf](reports/LINEBot-AI智慧助理Bot第一版-成果簡報.pdf)（第一版）
